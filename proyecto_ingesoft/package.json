@@ -1,28 +1,76 @@
 {
-  "name": "proyecto_ingesoft",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
+  "name": "turismo-app",
+  "version": "1.0.0",
+  "main": "main.js",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "lint": "eslint .",
-    "preview": "vite preview"
+    "postinstall": "cd frontend && npm install && npm run build && cd ../backend && npm install",
+    "start": "electron .",
+    "dev": "npm run start",
+    "build-frontend": "cd frontend && npm run build",
+    "build": "npm run build-frontend && electron-builder",
+    "build:win": "npm run build-frontend && electron-builder --win",
+    "build:mac": "npm run build-frontend && electron-builder --mac",
+    "build:linux": "npm run build-frontend && electron-builder --linux",
+    "dist": "npm run build",
+    "rebuild": "cd frontend && npm run build"
   },
-  "dependencies": {
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0",
-    "react-router-dom": "^7.6.3"
+  "build": {
+    "appId": "com.turismo.app",
+    "productName": "TurismoApp",
+    "description": "Aplicación de turismo para descubrir y compartir lugares increíbles",
+    "copyright": "Copyright © 2024 TurismoApp",
+    "files": [
+      "main.js",
+      "frontend/dist/**/*",
+      "backend/**/*",
+      "node_modules/**/*",
+      "package.json"
+    ],
+    "directories": {
+      "buildResources": "assets"
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        }
+      ],
+      "icon": "assets/icon.ico"
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": ["x64", "arm64"]
+        }
+      ],
+      "icon": "assets/icon.icns",
+      "category": "public.app-category.travel"
+    },
+    "linux": {
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": ["x64"]
+        },
+        {
+          "target": "deb",
+          "arch": ["x64"]
+        }
+      ],
+      "icon": "assets/icon.png",
+      "category": "Travel"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    }
   },
   "devDependencies": {
-    "@eslint/js": "^9.29.0",
-    "@types/react": "^19.1.8",
-    "@types/react-dom": "^19.1.6",
-    "@vitejs/plugin-react": "^4.5.2",
-    "eslint": "^9.29.0",
-    "eslint-plugin-react-hooks": "^5.2.0",
-    "eslint-plugin-react-refresh": "^0.4.20",
-    "globals": "^16.2.0",
-    "vite": "^7.0.0"
+    "electron": "^28.0.0",
+    "electron-builder": "^24.0.0"
   }
 }
