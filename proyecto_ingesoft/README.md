@@ -1,6 +1,6 @@
 <div align="center">
   
-![OSPREY Logo](https://raw.githubusercontent.com/jorge9805/ingenieria-de-software/main/assets/osprey-logo.png)
+![OSPREY Logo](https://raw.githubusercontent.com/jorge9805/ingenieria-de-software/main/proyecto_ingesoft/assets/osprey-logo.png)
 
 # OSPREY - TurismoApp
 
