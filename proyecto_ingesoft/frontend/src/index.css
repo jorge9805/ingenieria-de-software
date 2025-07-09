@@ -1,17 +1,17 @@
-/* Variables CSS para consistencia */
+/* Variables CSS para consistencia - Tema OSPREY */
 :root {
-  --primary-color: #0077b6;
-  --primary-dark: #005f8a;
-  --secondary-color: #00b4d8;
-  --accent-color: #ff6b6b;
+  --primary-color: #1a1a1a;
+  --primary-dark: #000000;
+  --secondary-color: #333333;
+  --accent-color: #666666;
   --success-color: #51cf66;
   --warning-color: #ffd43b;
-  --text-primary: #2d3748;
-  --text-secondary: #718096;
+  --text-primary: #1a1a1a;
+  --text-secondary: #666666;
   --bg-primary: #ffffff;
-  --bg-secondary: #f7fafc;
-  --bg-tertiary: #edf2f7;
-  --border-color: #e2e8f0;
+  --bg-secondary: #f8f9fa;
+  --bg-tertiary: #e9ecef;
+  --border-color: #dee2e6;
   --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
@@ -35,7 +35,7 @@
 
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
   min-height: 100vh;
   color: var(--text-primary);
   line-height: 1.6;
@@ -63,7 +63,7 @@ body {
 }
 
 .navbar .logo {
-  font-size: 1.75rem;
+  font-size: 1.5rem;
   font-weight: 700;
   color: var(--primary-color);
   text-decoration: none;
@@ -71,6 +71,12 @@ body {
   align-items: center;
   gap: var(--spacing-sm);
   transition: transform 0.2s ease;
+}
+
+.navbar .logo .logo-img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
 }
 
 .navbar .logo:hover {

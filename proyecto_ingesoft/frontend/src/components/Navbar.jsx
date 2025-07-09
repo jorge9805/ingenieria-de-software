@@ -29,8 +29,8 @@ export default function Navbar({ user, setUser, setToken, onLogout, currentPath 
   return (
     <nav className="navbar">
       <Link to="/" className="logo">
-        <span>🌎</span>
-        <span>TurismoApp</span>
+        <img src="/osprey-logo.png" alt="OSPREY" className="logo-img" />
+        <span>OSPREY</span>
       </Link>
       
       <div className="actions">
