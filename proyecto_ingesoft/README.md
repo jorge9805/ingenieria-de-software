@@ -1,6 +1,43 @@
 <div align="center">
   
-<img src="https://raw.githubusercontent.com/jorge9805/ingenieria-de-software/refs/heads/main/proyecto_ingesoft/assets/osprey-logo.png" alt="OSPREY Logo" width="200">
+<img src="## 🚀 Guía de Inicio Rápido
+
+### Prerrequisitos
+- **Node.js** (v18+) - [Descargar](https://nodejs.org/)
+- **PostgreSQL** (v13+) - [Descargar](https://www.postgresql.org/download/)
+- **Git** - [Descargar](https://git-scm.com/)
+
+### 📥 Clonar el Repositorio
+
+```bash
+git clone https://github.com/jorge9805/ingenieria-de-software.git
+cd ingenieria-de-software/proyecto_ingesoft
+```
+
+## ⚡ Opción 1: Instalación Automática (Recomendada)
+
+### Para Linux/macOS:
+```bash
+# Ejecutar script de instalación automática
+./install.sh
+```
+
+### Para Windows:
+```cmd
+# Ejecutar script de instalación automática
+install.bat
+```
+
+**¿Qué hace el script automático?**
+- ✅ Instala todas las dependencias (frontend y backend)
+- ✅ Construye el frontend automáticamente
+- ✅ Configura variables de entorno
+- ✅ Configura la base de datos (opcional)
+- ✅ Verifica que todo esté listo para ejecutar
+
+---
+
+## 🔧 Opción 2: Instalación Manualithubusercontent.com/jorge9805/ingenieria-de-software/refs/heads/main/proyecto_ingesoft/assets/osprey-logo.png" alt="OSPREY Logo" width="200">
 
 # OSPREY - TurismoApp
 
@@ -70,25 +107,23 @@ PORT=4000
 
 ### 🏃‍♂️ Ejecutar la Aplicación
 
-#### Para Linux:
+Después de la instalación automática o manual:
+
 ```bash
-# Instalar dependencias
-npm install
-
-# Ejecutar aplicación
 npm start
 ```
 
-#### Para Windows:
-```cmd
-# Instalar dependencias
-npm install
-
-# Ejecutar aplicación
-npm start
-```
+La aplicación se abrirá automáticamente y estará disponible en tu navegador.
 
 ### 🆘 Problemas Comunes
+
+**Si usaste la instalación automática y hay errores:**
+```bash
+# Ejecutar manualmente el script paso a paso
+npm install
+npm run rebuild
+npm start
+```
 
 **PostgreSQL no conecta:**
 ```bash
@@ -99,10 +134,9 @@ sudo systemctl start postgresql
 net start postgresql-x64-13
 ```
 
-**Pantalla en blanco:**
+**Base de datos no configurada:**
 ```bash
-npm run rebuild
-npm start
+psql -U postgres -f database_setup.sql
 ```
 
 **Puerto ocupado:**
@@ -128,11 +162,13 @@ cd backend && npm start
 
 ```
 proyecto_ingesoft/
-├──  frontend/              # Aplicación React
+├── 📁 frontend/              # Aplicación React
 ├── 📁 backend/               # API Express
-├──  package.json           # Scripts principales
-├── � database_setup.sql     # Setup de BD
-└── 📄 README.md             # Esta guía
+├── 📄 package.json           # Scripts principales
+├── 📄 database_setup.sql     # Setup de BD
+├── 📄 install.sh             # Instalación automática (Linux/macOS)
+├── 📄 install.bat            # Instalación automática (Windows)
+└── 📄 README.md              # Esta guía
 ```
 
 ## 🎨 Tecnologías
