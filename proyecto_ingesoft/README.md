@@ -15,7 +15,7 @@
 
 ## 📝 Descripción del Proyecto
 
-TurismoApp es una aplicación web moderna para descubrir, compartir y comentar lugares turísticos. Los usuarios pueden explorar destinos, calificar experiencias, guardar favoritos y compartir recomendaciones con la comunidad.
+Osprey es una aplicación web moderna para descubrir, compartir y comentar lugares turísticos. Los usuarios pueden explorar destinos, calificar experiencias, guardar favoritos y compartir recomendaciones con la comunidad.
 
 **Tecnologías:** React, Node.js, PostgreSQL, Express
 
