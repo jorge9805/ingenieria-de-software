@@ -35,16 +35,30 @@ export default function App() {
       
       if (savedToken && savedUser) {
         try {
-          // Verificar si el token sigue siendo válido haciendo una petición de prueba
-          const response = await fetch('http://localhost:4000/api/posts', {
-            headers: { Authorization: `Bearer ${savedToken}` }
+          // Verificar si el token es válido probando una función protegida (favoritos)
+          const response = await fetch('http://localhost:4000/api/favorites', {
+            headers: { 
+              Authorization: `Bearer ${savedToken}`,
+              'Content-Type': 'application/json'
+            }
           })
           
-          if (response.ok) {
-            setUser(savedUser)
-            setToken(savedToken)
+          if (response.ok || response.status === 401) {
+            // Si es 401, significa que el endpoint existe pero el token es inválido
+            if (response.status === 401) {
+              console.log('Token expirado o inválido, cerrando sesión...')
+              localStorage.removeItem('token')
+              localStorage.removeItem('username')
+              setUser(null)
+              setToken(null)
+            } else {
+              // Token válido
+              setUser(savedUser)
+              setToken(savedToken)
+            }
           } else {
-            // Token inválido, limpiar
+            // Otros errores, limpiar sesión
+            console.log('Error de validación, cerrando sesión...')
             localStorage.removeItem('token')
             localStorage.removeItem('username')
             setUser(null)
@@ -52,7 +66,12 @@ export default function App() {
           }
         } catch (error) {
           console.error('Error validating token:', error)
-          // En caso de error de red, mantener los datos locales
+          // En caso de error de red, cerrar sesión por seguridad
+          console.log('Error de conexión, cerrando sesión por seguridad...')
+          localStorage.removeItem('token')
+          localStorage.removeItem('username')
+          setUser(null)
+          setToken(null)
         }
       }
       setIsLoading(false)

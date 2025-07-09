@@ -1,5 +1,8 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 
+// Importar el logo desde assets
+import ospreyLogo from '../assets/osprey-logo.png'
+
 export default function Navbar({ user, setUser, setToken, onLogout, currentPath }) {
   const navigate = useNavigate()
   const location = useLocation()
@@ -29,8 +32,7 @@ export default function Navbar({ user, setUser, setToken, onLogout, currentPath 
   return (
     <nav className="navbar">
       <Link to="/" className="logo">
-        <img src="/osprey-logo.png" alt="OSPREY" className="logo-img" />
-        <span>OSPREY</span>
+        <img src={ospreyLogo} alt="OSPREY" className="logo-img" />
       </Link>
       
       <div className="actions">
