@@ -1,6 +1,37 @@
 <div align="center">
   
-<img src="## 🚀 Guía de Inicio Rápido
+<img src="https://raw.githubusercontent.com/jorge9805/ingenieria-de-software/refs/heads/main/proyecto_ingesoft/assets/osprey-logo.png" alt="OSPREY Logo" width="40">
+
+# OSPREY - TurismoApp
+
+</div>
+
+## 👥 Team Sobrecupo
+
+- **Jorge Cuadrado Velásquez**
+- **Juan D'Aleman**
+- **Juan Ladino** 
+- **Smith Forero**
+
+## 📝 Descripción del Proyecto
+
+TurismoApp es una aplicación web moderna para descubrir, compartir y comentar lugares turísticos. Los usuarios pueden explorar destinos, calificar experiencias, guardar favoritos y compartir recomendaciones con la comunidad.
+
+**Tecnologías:** React, Node.js, PostgreSQL, Express
+
+![React](https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react)
+![Node.js](https://img.shields.io/badge/Node.js-18+-339933?style=for-the-badge&logo=node.js)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-13+-336791?style=for-the-badge&logo=postgresql)
+
+## ✨ Características
+
+- 🏞️ **Explorar Destinos**: Navega por una colección de lugares turísticos
+- ❤️ **Sistema de Favoritos**: Guarda tus lugares preferidos
+- ⭐ **Calificaciones y Comentarios**: Comparte tu experiencia y lee la de otros
+- 🔐 **Autenticación Segura**: Sistema de registro y login con JWT
+- 📱 **Diseño Responsivo**: Interfaz moderna y adaptable
+
+## 🚀 Guía de Inicio Rápido
 
 ### Prerrequisitos
 - **Node.js** (v18+) - [Descargar](https://nodejs.org/)
@@ -37,51 +68,7 @@ install.bat
 
 ---
 
-## 🔧 Opción 2: Instalación Manualithubusercontent.com/jorge9805/ingenieria-de-software/refs/heads/main/proyecto_ingesoft/assets/osprey-logo.png" alt="OSPREY Logo" width="200">
-
-# OSPREY - TurismoApp
-
-
-</div>
-
-## 👥 Team Sobrecupo
-
-- **Jorge Cuadrado Velásquez**
-- **Juan D'Aleman**
-- **Juan Ladino** 
-- **Smith Forero**
-
-## 📝 Descripción del Proyecto
-
-TurismoApp es una aplicación web moderna para descubrir, compartir y comentar lugares turísticos. Los usuarios pueden explorar destinos, calificar experiencias, guardar favoritos y compartir recomendaciones con la comunidad.
-
-**Tecnologías:** React, Node.js, PostgreSQL, Express
-
-![React](https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react)
-![Node.js](https://img.shields.io/badge/Node.js-18+-339933?style=for-the-badge&logo=node.js)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-13+-336791?style=for-the-badge&logo=postgresql)
-
-## ✨ Características
-
-- 🏞️ **Explorar Destinos**: Navega por una colección de lugares turísticos
-- ❤️ **Sistema de Favoritos**: Guarda tus lugares preferidos
-- ⭐ **Calificaciones y Comentarios**: Comparte tu experiencia y lee la de otros
-- 🔐 **Autenticación Segura**: Sistema de registro y login con JWT
-- 📱 **Diseño Responsivo**: Interfaz moderna y adaptable
-
-## � Guía de Inicio Rápido
-
-### Prerrequisitos
-- **Node.js** (v18+) - [Descargar](https://nodejs.org/)
-- **PostgreSQL** (v13+) - [Descargar](https://www.postgresql.org/download/)
-- **Git** - [Descargar](https://git-scm.com/)
-
-### 📥 Clonar el Repositorio
-
-```bash
-git clone https://github.com/jorge9805/ingenieria-de-software.git
-cd ingenieria-de-software/proyecto_ingesoft
-```
+## 🔧 Opción 2: Instalación Manual
 
 ### 🗄️ Configurar Base de Datos
 
@@ -103,6 +90,16 @@ Crear archivo `backend/.env`:
 DB_PASSWORD=tu_password_postgresql
 JWT_SECRET=tu_clave_secreta_aqui
 PORT=4000
+```
+
+### 📦 Instalar Dependencias
+
+```bash
+# Instalar dependencias del proyecto
+npm install
+
+# Construir el frontend
+npm run rebuild
 ```
 
 ### 🏃‍♂️ Ejecutar la Aplicación
