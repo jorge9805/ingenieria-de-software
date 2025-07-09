@@ -1,6 +1,6 @@
 <div align="center">
   
-<img src="https://raw.githubusercontent.com/jorge9805/ingenieria-de-software/proyecto_ingesoft/assets/osprey-logo.png" alt="OSPREY Logo" width="40">
+<img src="https://raw.githubusercontent.com/jorge9805/ingenieria-de-software/refs/heads/main/proyecto_ingesoft/assets/osprey-logo.png" alt="OSPREY Logo" width="200">
 
 # OSPREY - TurismoApp
 
