@@ -63,7 +63,7 @@ export default function CommentForm({ user, token }) {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ postId, comment_text: comment_text.trim(), rating })
+        body: JSON.stringify({ postId, content: comment_text.trim(), rating })
       })
 
       if (!res.ok) {

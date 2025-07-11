@@ -166,7 +166,7 @@ export default function PostDetail({ user, token }) {
                     </div>
                   </div>
                   <div className="comment-text">
-                    {comment.comment_text}
+                    {comment.content}
                   </div>
                 </div>
               ))}

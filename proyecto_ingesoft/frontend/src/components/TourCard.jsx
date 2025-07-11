@@ -3,18 +3,12 @@ import { useState, useEffect } from 'react'
 import { Heart, Trash2, Calendar, MapPin, User } from 'lucide-react'
 
 export default function TourCard({ post, user, token, onToggleFavorite, onDelete, isDetailView = false }) {
-  const [fav, setFav] = useState(Boolean(post.is_favorite))
+  const [fav, setFav] = useState(post.is_favorite)
   
   // Actualizar estado local cuando cambie el prop
   useEffect(() => {
-    console.log('TourCard useEffect:', post.title, 'is_favorite:', post.is_favorite, 'typeof:', typeof post.is_favorite)
-    setFav(Boolean(post.is_favorite))
+    setFav(post.is_favorite)
   }, [post.is_favorite])
-  
-  // Debug: verificar el estado inicial
-  useEffect(() => {
-    console.log('TourCard mounted - Post:', post.title, 'Initial fav state:', fav, 'is_favorite prop:', post.is_favorite)
-  }, [])
   
   const handleFav = async () => {
     if (!user) return

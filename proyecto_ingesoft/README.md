@@ -17,11 +17,11 @@
 
 Osprey es una aplicación web moderna para descubrir, compartir y comentar lugares turísticos. Los usuarios pueden explorar destinos, calificar experiencias, guardar favoritos y compartir recomendaciones con la comunidad.
 
-**Tecnologías:** React, Node.js, PostgreSQL, Express
+**Tecnologías:** React, Node.js, SQLite, Express
 
 ![React](https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react)
 ![Node.js](https://img.shields.io/badge/Node.js-18+-339933?style=for-the-badge&logo=node.js)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-13+-336791?style=for-the-badge&logo=postgresql)
+![SQLite](https://img.shields.io/badge/SQLite-3.36+-003B57?style=for-the-badge&logo=sqlite)
 
 ## ✨ Características
 
@@ -35,8 +35,9 @@ Osprey es una aplicación web moderna para descubrir, compartir y comentar lugar
 
 ### Prerrequisitos
 - **Node.js** (v18+) - [Descargar](https://nodejs.org/)
-- **PostgreSQL** (v13+) - [Descargar](https://www.postgresql.org/download/)
 - **Git** - [Descargar](https://git-scm.com/)
+
+*SQLite se incluye automáticamente - ¡no necesitas instalar nada más!*
 
 ### 📥 Clonar el Repositorio
 
@@ -63,7 +64,8 @@ install.bat
 - ✅ Instala todas las dependencias (frontend y backend)
 - ✅ Construye el frontend automáticamente
 - ✅ Configura variables de entorno
-- ✅ Configura la base de datos (opcional)
+- ✅ Configura la base de datos SQLite automáticamente
+- ✅ Inserta datos de ejemplo
 - ✅ Verifica que todo esté listo para ejecutar
 
 ---
@@ -72,24 +74,19 @@ install.bat
 
 ### 🗄️ Configurar Base de Datos
 
-**Método Rápido:**
-```bash
-psql -U postgres -f database_setup.sql
-```
+**¡No necesitas hacer nada!** SQLite se configura automáticamente cuando ejecutas la aplicación.
 
-**Método Manual:**
-1. Abrir PostgreSQL: `psql -U postgres`
-2. Crear base de datos: `CREATE DATABASE turismo_db;`
-3. Conectarse: `\c turismo_db`
-4. Ejecutar el contenido de `database_setup.sql`
+- 📁 **Ubicación**: `backend/database/turismo.db`
+- 🌱 **Datos de ejemplo**: Se insertan automáticamente
+- 👤 **Usuario demo**: `demo@turismo.com` / `demo123`
 
 ### ⚙️ Configurar Variables de Entorno
 
 Crear archivo `backend/.env`:
 ```env
-DB_PASSWORD=tu_password_postgresql
-JWT_SECRET=tu_clave_secreta_aqui
+JWT_SECRET=tu_clave_secreta_muy_segura_aqui_cambiala_en_produccion
 PORT=4000
+NODE_ENV=development
 ```
 
 ### 📦 Instalar Dependencias
@@ -122,22 +119,22 @@ npm run rebuild
 npm start
 ```
 
-**PostgreSQL no conecta:**
+**La aplicación no inicia:**
 ```bash
-# Linux
-sudo systemctl start postgresql
+# Verificar versión de Node.js
+node --version  # Debe ser v18+
 
-# Windows
-net start postgresql-x64-13
-```
-
-**Base de datos no configurada:**
-```bash
-psql -U postgres -f database_setup.sql
+# Reinstalar dependencias
+npm install
+cd backend && npm install
 ```
 
 **Puerto ocupado:**
 Cambiar `PORT=4001` en `backend/.env`
+
+**Problemas con SQLite:**
+- La base de datos se crea automáticamente en `backend/database/turismo.db`
+- Si hay problemas, elimina la carpeta `backend/database` y reinicia la app
 
 ## 🛠️ Comandos Útiles
 
@@ -172,7 +169,7 @@ proyecto_ingesoft/
 
 **Frontend:** React, Vite, CSS3  
 **Backend:** Node.js, Express, JWT  
-**Base de Datos:** PostgreSQL  
+**Base de Datos:** SQLite (automática y portable)  
 
 ## 🤝 Contribuir
 

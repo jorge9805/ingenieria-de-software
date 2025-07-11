@@ -1,14 +1,12 @@
 import express from 'express'
-import pool from '../db.js'
+import db from '../db.js'
 import verifyToken from '../middleware/auth.js'
 const router = express.Router()
 
 // Endpoint de prueba para verificar conectividad
 router.get('/test', verifyToken, async (req, res) => {
   try {
-    console.log('Test endpoint - usuario:', req.user.id);
-    const testResult = await pool.query('SELECT 1 as test');
-    console.log('Database connection OK');
+    const testResult = await db.query('SELECT 1 as test');
     res.json({ message: 'OK', user: req.user.id, dbTest: testResult.rows[0] });
   } catch (err) {
     console.error('Test endpoint error:', err);
@@ -19,29 +17,22 @@ router.get('/test', verifyToken, async (req, res) => {
 // Listar favoritos del usuario
 router.get('/', verifyToken, async (req, res) => {
   try {
-    console.log('=== INICIO FAVORITOS ===');
-    console.log('Obteniendo favoritos para usuario:', req.user.id);
-    
-    // Consulta más simple para debug
-    const result = await pool.query(
+    // Consulta que incluye el cálculo de rating promedio
+    const result = await db.query(
       `SELECT p.id as post_id, p.title, p.description, p.image_url, p.created_at, p.user_id as post_user_id,
-              u.name AS user_name
+              u.username AS user_name,
+              ROUND(AVG(c.rating), 1) AS average_rating
        FROM favorites f
        JOIN posts p ON p.id = f.post_id
        JOIN users u ON u.id = p.user_id
-       WHERE f.user_id = $1
+       LEFT JOIN comments c ON c.post_id = p.id
+       WHERE f.user_id = ?
+       GROUP BY p.id, p.title, p.description, p.image_url, p.created_at, p.user_id, u.username
        ORDER BY p.created_at DESC`,
       [req.user.id]
     )
     
-    console.log('Consulta ejecutada exitosamente');
-    console.log('Favoritos encontrados:', result.rows.length);
-    
-    if (result.rows.length > 0) {
-      console.log('Primer resultado:', result.rows[0]);
-    }
-    
-    // Mapear resultados de forma simple
+    // Mapear resultados
     const posts = result.rows.map(row => ({
       id: row.post_id,
       title: row.title,
@@ -51,21 +42,12 @@ router.get('/', verifyToken, async (req, res) => {
       user_id: row.post_user_id,
       user_name: row.user_name,
       is_favorite: true,
-      average_rating: "0"
+      average_rating: row.average_rating || null
     }))
-    
-    console.log('Posts mapeados:', posts.length);
-    if (posts.length > 0) {
-      console.log('Primer post mapeado:', posts[0]);
-      console.log('is_favorite del primer post:', posts[0].is_favorite);
-    }
-    console.log('=== FIN FAVORITOS ===');
     
     res.json(posts)
   } catch (err) {
-    console.error('=== ERROR EN FAVORITOS ===');
-    console.error('Error completo:', err);
-    console.error('Stack trace:', err.stack);
+    console.error('Error al obtener favoritos:', err);
     res.status(500).json({ error: 'Error al obtener favoritos', details: err.message })
   }
 })
@@ -74,18 +56,28 @@ router.get('/', verifyToken, async (req, res) => {
 router.post('/', verifyToken, async (req, res) => {
   const { postId } = req.body
   try {
-    const existing = await pool.query(
-      `SELECT * FROM favorites WHERE user_id=$1 AND post_id=$2`,
+    const existing = await db.query(
+      `SELECT * FROM favorites WHERE user_id=? AND post_id=?`,
       [req.user.id, postId]
     )
     if (existing.rows.length) {
       return res.status(400).json({ error: 'Ya está en favoritos' })
     }
-    const result = await pool.query(
-      `INSERT INTO favorites (user_id, post_id) VALUES ($1,$2) RETURNING *`,
+    const result = await db.query(
+      `INSERT INTO favorites (user_id, post_id) VALUES (?, ?)`,
       [req.user.id, postId]
     )
-    res.status(201).json(result.rows[0])
+    
+    // Obtener el favorito recién creado
+    const newFavorite = await db.query(
+      `SELECT f.*, p.title, p.description, p.image_url
+       FROM favorites f
+       JOIN posts p ON f.post_id = p.id
+       WHERE f.id = ?`,
+      [result.insertId]
+    )
+    
+    res.status(201).json(newFavorite.rows[0])
   } catch (err) {
     console.error(err)
     res.status(500).json({ error: 'No se pudo añadir favorito' })
@@ -96,7 +88,7 @@ router.post('/', verifyToken, async (req, res) => {
 router.delete('/', verifyToken, async (req, res) => {
   const { postId } = req.body
   try {
-    await pool.query(`DELETE FROM favorites WHERE user_id=$1 AND post_id=$2`, [req.user.id, postId])
+    await db.query(`DELETE FROM favorites WHERE user_id=? AND post_id=?`, [req.user.id, postId])
     res.json({ removed: true })
   } catch (err) {
     console.error(err)

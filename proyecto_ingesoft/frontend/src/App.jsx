@@ -27,6 +27,34 @@ export default function App() {
 
   const triggerRefresh = () => setRefreshPosts(prev => prev + 1)
 
+  // Forzar limpieza de tokens inválidos
+  useEffect(() => {
+    const forceCleanInvalidTokens = () => {
+      const savedToken = localStorage.getItem('token')
+      if (savedToken) {
+        try {
+          // Verificar si el token parece válido (estructura básica)
+          const parts = savedToken.split('.')
+          if (parts.length !== 3) {
+            console.log('Token malformado, limpiando...')
+            localStorage.removeItem('token')
+            localStorage.removeItem('username')
+            setUser(null)
+            setToken(null)
+          }
+        } catch (error) {
+          console.log('Error verificando token, limpiando...')
+          localStorage.removeItem('token')
+          localStorage.removeItem('username')
+          setUser(null)
+          setToken(null)
+        }
+      }
+    }
+    
+    forceCleanInvalidTokens()
+  }, [])
+
   // Validar token al iniciar la aplicación
   useEffect(() => {
     const validateToken = async () => {
@@ -43,37 +71,30 @@ export default function App() {
             }
           })
           
-          if (response.ok || response.status === 401) {
-            // Si es 401, significa que el endpoint existe pero el token es inválido
-            if (response.status === 401) {
-              console.log('Token expirado o inválido, cerrando sesión...')
-              localStorage.removeItem('token')
-              localStorage.removeItem('username')
-              setUser(null)
-              setToken(null)
-            } else {
-              // Token válido
-              setUser(savedUser)
-              setToken(savedToken)
-            }
+          if (response.ok) {
+            // Token válido, mantener sesión
+            setUser(savedUser)
+            setToken(savedToken)
           } else {
-            // Otros errores, limpiar sesión
-            console.log('Error de validación, cerrando sesión...')
+            // Token inválido, limpiar todo
             localStorage.removeItem('token')
             localStorage.removeItem('username')
             setUser(null)
             setToken(null)
           }
         } catch (error) {
-          console.error('Error validating token:', error)
-          // En caso de error de red, cerrar sesión por seguridad
-          console.log('Error de conexión, cerrando sesión por seguridad...')
+          // Error de conexión, limpiar sesión por seguridad
           localStorage.removeItem('token')
           localStorage.removeItem('username')
           setUser(null)
           setToken(null)
         }
+      } else {
+        // No hay token o usuario guardado
+        setUser(null)
+        setToken(null)
       }
+      
       setIsLoading(false)
     }
 

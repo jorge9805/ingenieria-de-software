@@ -23,10 +23,10 @@ export default function Login({ setUser, setToken }) {
       const data = await res.json()
 
       if (res.ok) {
-        setUser(data.name)
+        setUser(data.username)
         setToken(data.token)
         localStorage.setItem('token', data.token)
-        localStorage.setItem('username', data.name)
+        localStorage.setItem('username', data.username)
         setError(null)
         navigate('/')
       } else {

@@ -29,15 +29,6 @@ if errorlevel 1 (
     exit /b 1
 )
 
-rem Verificar PostgreSQL
-psql --version >nul 2>&1
-if errorlevel 1 (
-    echo ❌ Error: PostgreSQL no está instalado. Descárgalo desde https://www.postgresql.org/download/
-    echo    Asegúrate de que psql esté en el PATH del sistema.
-    pause
-    exit /b 1
-)
-
 rem Verificar Git
 git --version >nul 2>&1
 if errorlevel 1 (
@@ -53,8 +44,8 @@ rem Mostrar versiones
 echo 📋 Versiones instaladas:
 for /f "tokens=*" %%i in ('node --version') do echo Node.js: %%i
 for /f "tokens=*" %%i in ('npm --version') do echo npm: %%i
-for /f "tokens=1-3" %%i in ('psql --version') do echo PostgreSQL: %%i %%j %%k
 for /f "tokens=1-3" %%i in ('git --version') do echo Git: %%i %%j %%k
+echo Base de datos: SQLite (incluida automáticamente)
 echo.
 
 rem Instalar dependencias del proyecto principal
@@ -141,7 +132,7 @@ if not exist "backend\.env" (
     if exist ".env.example" (
         copy ".env.example" "backend\.env" >nul
         echo ✅ Archivo .env creado desde .env.example
-        echo ⚠️ IMPORTANTE: Edita backend\.env con tu configuración de PostgreSQL
+        echo ⚠️ IMPORTANTE: Edita backend\.env con tu JWT_SECRET personalizado
     ) else (
         echo ❌ Error: No se encontró .env.example para crear la configuración
         pause
@@ -152,44 +143,11 @@ if not exist "backend\.env" (
 )
 echo.
 
-rem Verificar conexión a PostgreSQL
-echo 🗄️ Verificando conexión a PostgreSQL...
-
-rem Intentar conectarse a PostgreSQL
-psql -U postgres -c "SELECT version();" >nul 2>&1
-if errorlevel 1 (
-    echo ⚠️ No se pudo conectar a PostgreSQL. Verifica que esté corriendo:
-    echo    Windows: Usar Services.msc para iniciar el servicio PostgreSQL
-    echo    o usar pgAdmin para administrar el servidor
-    echo.
-    echo ⚠️ Recuerda configurar la base de datos manualmente después:
-    echo    psql -U postgres -f database_setup.sql
-) else (
-    echo ✅ Conexión a PostgreSQL exitosa
-    echo.
-    set /p setup_db="🚀 ¿Quieres configurar la base de datos automáticamente? (y/n): "
-    
-    if /i "!setup_db!"=="y" (
-        echo 📊 Configurando base de datos...
-        
-        if exist "database_setup.sql" (
-            psql -U postgres -f database_setup.sql
-            
-            if errorlevel 1 (
-                echo ⚠️ Hubo algunos errores en la configuración de la base de datos
-                echo Puedes ejecutar manualmente: psql -U postgres -f database_setup.sql
-            ) else (
-                echo ✅ Base de datos configurada exitosamente
-            )
-        ) else (
-            echo ⚠️ No se encontró database_setup.sql
-        )
-    ) else (
-        echo ⚠️ Recuerda configurar la base de datos manualmente:
-        echo psql -U postgres -f database_setup.sql
-    )
-)
-
+rem Configuración automática de SQLite
+echo 🗄️ Configurando base de datos SQLite...
+echo ✅ SQLite se configurará automáticamente al iniciar la aplicación
+echo 📁 Base de datos se creará en: backend\database\turismo.db
+echo 🌱 Datos de ejemplo se insertarán automáticamente
 echo.
 
 rem Resumen final
@@ -203,10 +161,19 @@ echo Comandos útiles:
 echo npm run rebuild    # Reconstruir frontend
 echo npm run build      # Empaquetar para distribución
 echo.
+echo Características de SQLite:
+echo ✅ Sin configuración adicional necesaria
+echo ✅ Base de datos portable en un archivo
+echo ✅ Datos de ejemplo incluidos automáticamente
+echo.
+echo Usuario demo disponible:
+echo 📧 Email: demo@turismo.com
+echo 🔑 Password: demo123
+echo.
 echo Si hay problemas:
-echo 1. Verifica que PostgreSQL esté corriendo (Services.msc)
-echo 2. Edita backend\.env con tu configuración
-echo 3. Ejecuta database_setup.sql manualmente
+echo 1. Verifica que Node.js esté actualizado (v18+)
+echo 2. Edita backend\.env con tu JWT_SECRET personalizado
+echo 3. La base de datos SQLite se crea automáticamente
 echo.
 echo 📚 Lee el README.md para más información
 echo.

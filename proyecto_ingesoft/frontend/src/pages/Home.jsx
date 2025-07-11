@@ -18,31 +18,21 @@ export default function Home({ user, token, refreshPosts }) {
       let url = 'http://localhost:4000/api/posts'
       if (filter === 'favorites') url = 'http://localhost:4000/api/favorites'
       if (filter === 'myposts') url = 'http://localhost:4000/api/posts/my'
+      // filter === 'all' o sin filtro usa la URL base
       
-      console.log('Fetching from:', url, 'with filter:', filter)
-      console.log('Token:', token ? 'Present' : 'Missing')
+      // Construir headers condicionalmente
+      const headers = {}
+      if (token) {
+        headers.Authorization = `Bearer ${token}`
+      }
       
-      const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } })
+      const res = await fetch(url, { headers })
       
       if (!res.ok) {
-        console.error('Response not OK:', res.status, res.statusText)
-        const errorData = await res.json().catch(() => ({}))
-        console.error('Error response:', errorData)
-        console.error('Error details:', errorData.details)
         return
       }
       
       const data = await res.json()
-      
-      console.log('Received data:', data)
-      console.log('Data length:', data.length)
-      
-      // Debug: verificar el primer elemento si existe
-      if (data.length > 0) {
-        console.log('Primer post recibido:', data[0])
-        console.log('is_favorite del primer post:', data[0].is_favorite)
-      }
-      
       setPosts(data)
     } catch (error) {
       console.error('Error fetching posts:', error)

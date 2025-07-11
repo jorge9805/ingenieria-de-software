@@ -3,7 +3,7 @@ import { useState } from 'react'
 
 export default function Register({ setUser, setToken }) {
   const navigate = useNavigate()
-  const [name, setName] = useState('')
+  const [username, setUsername] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -30,16 +30,16 @@ export default function Register({ setUser, setToken }) {
       const res = await fetch('http://localhost:4000/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password })
+        body: JSON.stringify({ username, email, password })
       })
 
       const data = await res.json()
 
       if (res.ok) {
         // Login automático tras registro
-        setUser(data.name)
+        setUser(data.username)
         setToken(data.token)
-        localStorage.setItem('username', data.name)
+        localStorage.setItem('username', data.username)
         localStorage.setItem('token', data.token)
         setError(null)
         navigate('/')
@@ -74,13 +74,13 @@ export default function Register({ setUser, setToken }) {
           )}
           
           <div className="form-group">
-            <label htmlFor="name">Nombre completo</label>
+            <label htmlFor="username">Nombre de usuario</label>
             <input
-              id="name"
+              id="username"
               type="text"
-              placeholder="Tu nombre completo"
-              value={name}
-              onChange={e => setName(e.target.value)}
+              placeholder="Tu nombre de usuario"
+              value={username}
+              onChange={e => setUsername(e.target.value)}
               required
               disabled={isLoading}
             />

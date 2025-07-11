@@ -1,26 +1,43 @@
 import jwt from 'jsonwebtoken';
 const SECRET = process.env.JWT_SECRET || 'secreto';
 
+// Middleware que requiere autenticación
 export default function verifyToken(req, res, next) {
-  console.log('Middleware auth ejecutándose para:', req.url); // Debug log
-  
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    console.log('Token no proporcionado o formato incorrecto'); // Debug log
     return res.status(401).json({ error: 'Token no proporcionado' });
   }
 
   const token = authHeader.split(' ')[1];
-  console.log('Token recibido:', token ? 'Present' : 'Missing'); // Debug log
 
   try {
     const decoded = jwt.verify(token, SECRET);
-    console.log('Token verificado para usuario:', decoded.id, decoded.name); // Debug log
-    req.user = decoded; // puedes usar req.user.id y req.user.name
+    req.user = decoded; // puedes usar req.user.id y req.user.username
     next();
   } catch (err) {
-    console.log('Error verificando token:', err.message); // Debug log
     res.status(403).json({ error: 'Token inválido o expirado' });
   }
+}
+
+// Middleware opcional que extrae usuario si está autenticado
+export function optionalAuth(req, res, next) {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    req.user = null;
+    return next();
+  }
+
+  const token = authHeader.split(' ')[1];
+
+  try {
+    const decoded = jwt.verify(token, SECRET);
+    req.user = decoded;
+  } catch (err) {
+    // Token inválido, continuar sin usuario
+    req.user = null;
+  }
+  
+  next();
 }
