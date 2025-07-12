@@ -46,22 +46,59 @@ git clone https://github.com/jorge9805/ingenieria-de-software.git
 cd ingenieria-de-software/proyecto_ingesoft
 ```
 
-## ⚡ Opción 1: Instalación Automática (Recomendada)
+## ⚡ Instalación
 
-### Para Linux/macOS:
+TurismoApp ofrece **múltiples métodos de instalación** para adaptarse a diferentes sistemas operativos y preferencias de terminal:
+
+### 📋 Requisitos Previos
+
+- **Node.js** v18 o superior ([Descargar aquí](https://nodejs.org/))
+- **npm** (incluido con Node.js)
+- **Git** (recomendado) ([Descargar aquí](https://git-scm.com/))
+
+*SQLite se incluye automáticamente - ¡no necesitas instalar nada más!*
+
+### 🛠️ Métodos de Instalación
+
+#### **Método 1: Script Automático** ⭐ *Recomendado*
+
+| Sistema | Terminal | Comando |
+|---------|----------|---------|
+| **Linux/macOS** | Terminal nativo | `./install.sh` |
+| **Windows** | Git Bash | `./install.sh` |
+| **Windows** | Command Prompt/PowerShell | `install.bat` |
+
+#### **Para Linux/macOS:**
 ```bash
 # Ejecutar script de instalación automática
 ./install.sh
 ```
 
-### Para Windows:
+#### **Para Windows:**
+
+##### 🥇 **Opción Recomendada - Git Bash:**
+```bash
+# 1. Instalar Git for Windows (si no lo tienes): https://git-scm.com/download/win
+# 2. Abrir Git Bash en la carpeta del proyecto
+# 3. Ejecutar:
+./install.sh
+```
+
+**Configurar Git Bash en VS Code** (opcional):
+1. `Ctrl + Shift + P` → "Terminal: Select Default Profile"
+2. Seleccionar **"Git Bash"**
+
+##### 🥈 **Opción Alternativa - Windows Nativo:**
 ```cmd
-# Ejecutar script de instalación automática
+# En Command Prompt o PowerShell de Windows
 install.bat
 ```
 
-**¿Qué hace el script automático?**
-- ✅ Instala todas las dependencias (frontend y backend)
+> 💡 **Recomendación**: Git Bash ofrece mejor compatibilidad y experiencia más consistente entre plataformas.
+
+#### **¿Qué hace el script automático?**
+- ✅ Verifica prerequisitos (Node.js, npm, Git)
+- ✅ Instala todas las dependencias (proyecto principal, frontend, backend)
 - ✅ Construye el frontend automáticamente
 - ✅ Configura variables de entorno
 - ✅ Configura la base de datos SQLite automáticamente
@@ -70,54 +107,112 @@ install.bat
 
 ---
 
-## 🔧 Opción 2: Instalación Manual
+#### **Método 2: Instalación Manual** 🔧
 
-### 🗄️ Configurar Base de Datos
+Si los scripts automáticos no funcionan en tu sistema:
+
+```bash
+# 1. Instalar dependencias del proyecto principal
+npm install
+
+# 2. Instalar y construir el frontend
+cd frontend
+npm install
+npm run build
+cd ..
+
+# 3. Instalar dependencias del backend
+cd backend
+npm install
+cd ..
+
+# 4. Configurar variables de entorno (opcional)
+# Copia .env.example a backend/.env y edita JWT_SECRET
+```
+
+---
+
+## 🗄️ Configuración de Base de Datos
 
 **¡No necesitas hacer nada!** SQLite se configura automáticamente cuando ejecutas la aplicación.
 
 - 📁 **Ubicación**: `backend/database/turismo.db`
-- 🌱 **Datos de ejemplo**: Se insertan automáticamente
+- 🌱 **Datos de ejemplo**: Se insertan automáticamente al iniciar
 - 👤 **Usuario demo**: `demo@turismo.com` / `demo123`
 
-### ⚙️ Configurar Variables de Entorno
+## ⚙️ Variables de Entorno (Opcional)
 
-Crear archivo `backend/.env`:
+Si necesitas personalizar la configuración, crea el archivo `backend/.env`:
 ```env
 JWT_SECRET=tu_clave_secreta_muy_segura_aqui_cambiala_en_produccion
 PORT=4000
 NODE_ENV=development
+CORS_ORIGIN=http://localhost:5173
 ```
 
-### 📦 Instalar Dependencias
+> � **Nota**: Los scripts automáticos crean este archivo por ti usando `.env.example`
 
-```bash
-# Instalar dependencias del proyecto
-npm install
+## 🏃‍♂️ Ejecutar la Aplicación
 
-# Construir el frontend
-npm run rebuild
-```
-
-### 🏃‍♂️ Ejecutar la Aplicación
+Una vez instalado (con cualquier método), ejecuta:
 
 Después de la instalación automática o manual:
 
+#### En Linux/macOS o Windows con Git Bash:
 ```bash
 npm start
 ```
 
-La aplicación se abrirá automáticamente y estará disponible en tu navegador.
+#### En Windows CMD/PowerShell:
+```cmd
+npm start
+```
 
-### 🆘 Problemas Comunes
+> 💡 **Recomendación para Windows**: Usar Git Bash proporciona una experiencia más consistente y mejor compatibilidad con herramientas de desarrollo.
 
-**Si usaste la instalación automática y hay errores:**
+La aplicación se abrirá automáticamente en una ventana de Electron.
+
+### 🆘 Solución de Problemas por Plataforma
+
+#### **Problemas con Scripts Automáticos:**
+
+**Linux/macOS:**
 ```bash
-# Ejecutar manualmente el script paso a paso
+# Si ./install.sh no funciona:
+chmod +x install.sh
+./install.sh
+
+# O instalación manual:
+npm install && cd frontend && npm install && npm run build && cd ../backend && npm install && cd ..
+```
+
+**Windows - Git Bash:**
+```bash
+# Si ./install.sh no funciona en Git Bash:
+# 1. Verificar que tengas Git for Windows instalado
+# 2. Probar con:
+bash install.sh
+
+# O usar instalación manual
+```
+
+**Windows - Command Prompt:**
+```cmd
+# Si install.bat no funciona:
+# 1. Ejecutar como administrador
+# 2. Verificar que Node.js esté en PATH
+# 3. Probar instalación manual paso a paso:
 npm install
-npm run rebuild
-npm start
+cd frontend
+npm install
+npm run build
+cd ..
+cd backend
+npm install
+cd ..
 ```
+
+#### **Problemas Generales:**
 
 **La aplicación no inicia:**
 ```bash
@@ -125,34 +220,47 @@ npm start
 node --version  # Debe ser v18+
 
 # Reinstalar dependencias
-npm install
-cd backend && npm install
+npm clean-install
+cd backend && npm clean-install && cd ..
+cd frontend && npm clean-install && cd ..
 ```
 
 **Puerto ocupado:**
-Cambiar `PORT=4001` en `backend/.env`
+- Cambiar `PORT=4001` en `backend/.env`
+- O cerrar otras aplicaciones que usen el puerto 4000
 
 **Problemas con SQLite:**
 - La base de datos se crea automáticamente en `backend/database/turismo.db`
 - Si hay problemas, elimina la carpeta `backend/database` y reinicia la app
 
-## 🛠️ Comandos Útiles
+**Problemas de permisos (Windows):**
+- Ejecutar terminal como administrador
+- Verificar que Windows Defender no esté bloqueando la instalación
 
+### 🐧 Configuración de Git Bash en Windows
+
+**¿Por qué Git Bash?**
+- ✅ Comandos consistentes entre Windows y Linux
+- ✅ Mejor compatibilidad con scripts de desarrollo
+- ✅ Soporte completo para herramientas modernas
+- ✅ Menos problemas con paths y comandos
+
+**Configuración en VS Code:**
+1. Instalar [Git for Windows](https://git-scm.com/download/win)
+2. En VS Code: `Ctrl + Shift + P`
+3. Buscar: "Terminal: Select Default Profile"
+4. Seleccionar: **"Git Bash"**
+5. Reiniciar VS Code
+
+**Verificar instalación:**
 ```bash
-# Ejecutar la aplicación
-npm start
-
-# Reconstruir frontend
-npm run rebuild
-
-# Desarrollo frontend
-cd frontend && npm run dev
-
-# Desarrollo backend
-cd backend && npm start
+# En Git Bash, estos comandos deben funcionar:
+node --version
+npm --version
+git --version
 ```
 
-## 📁 Estructura del Proyecto
+##  Estructura del Proyecto
 
 ```
 proyecto_ingesoft/
@@ -170,6 +278,8 @@ proyecto_ingesoft/
 **Frontend:** React, Vite, CSS3  
 **Backend:** Node.js, Express, JWT  
 **Base de Datos:** SQLite (automática y portable)  
+
+---
 
 ## 🤝 Contribuir
 

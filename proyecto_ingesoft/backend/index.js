@@ -19,6 +19,33 @@ async function startServer() {
     await initializeDatabase()
     console.log('✅ Base de datos SQLite configurada exitosamente')
     
+    // Health check endpoint
+    app.get('/', (req, res) => {
+      res.json({ 
+        status: 'OK', 
+        message: 'TurismoApp Backend is running',
+        timestamp: new Date().toISOString()
+      })
+    })
+    
+    app.get('/health', (req, res) => {
+      res.json({ 
+        status: 'healthy', 
+        service: 'turismo-backend',
+        timestamp: new Date().toISOString()
+      })
+    })
+
+    // Test endpoint para verificar conectividad desde frontend
+    app.get('/api/test', (req, res) => {
+      res.json({
+        status: 'connected',
+        message: 'Frontend successfully connected to backend',
+        timestamp: new Date().toISOString(),
+        headers: req.headers
+      })
+    })
+    
     // Rutas
     app.use('/api/auth', authRoutes)
     app.use('/api/posts', postRoutes)
