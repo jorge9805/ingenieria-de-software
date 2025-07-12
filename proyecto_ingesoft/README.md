@@ -48,8 +48,6 @@ cd ingenieria-de-software/proyecto_ingesoft
 
 ## ⚡ Instalación
 
-TurismoApp ofrece **múltiples métodos de instalación** para adaptarse a diferentes sistemas operativos y preferencias de terminal:
-
 ### 📋 Requisitos Previos
 
 - **Node.js** v18 o superior ([Descargar aquí](https://nodejs.org/))
@@ -75,26 +73,13 @@ TurismoApp ofrece **múltiples métodos de instalación** para adaptarse a difer
 ```
 
 #### **Para Windows:**
-
-##### 🥇 **Opción Recomendada - Git Bash:**
 ```bash
-# 1. Instalar Git for Windows (si no lo tienes): https://git-scm.com/download/win
-# 2. Abrir Git Bash en la carpeta del proyecto
-# 3. Ejecutar:
+# Opción 1: Con Git Bash
 ./install.sh
-```
 
-**Configurar Git Bash en VS Code** (opcional):
-1. `Ctrl + Shift + P` → "Terminal: Select Default Profile"
-2. Seleccionar **"Git Bash"**
-
-##### 🥈 **Opción Alternativa - Windows Nativo:**
-```cmd
-# En Command Prompt o PowerShell de Windows
+# Opción 2: Con Command Prompt/PowerShell
 install.bat
 ```
-
-> 💡 **Recomendación**: Git Bash ofrece mejor compatibilidad y experiencia más consistente entre plataformas.
 
 #### **¿Qué hace el script automático?**
 - ✅ Verifica prerequisitos (Node.js, npm, Git)
@@ -156,122 +141,11 @@ CORS_ORIGIN=http://localhost:5173
 
 Una vez instalado (con cualquier método), ejecuta:
 
-Después de la instalación automática o manual:
-
-#### En Linux/macOS o Windows con Git Bash:
 ```bash
 npm start
 ```
-
-#### En Windows CMD/PowerShell:
-```cmd
-npm start
-```
-
-> 💡 **Recomendación para Windows**: Usar Git Bash proporciona una experiencia más consistente y mejor compatibilidad con herramientas de desarrollo.
 
 La aplicación se abrirá automáticamente en una ventana de Electron.
-
-### 🆘 Solución de Problemas por Plataforma
-
-#### **Problemas con Scripts Automáticos:**
-
-**Linux/macOS:**
-```bash
-# Si ./install.sh no funciona:
-chmod +x install.sh
-./install.sh
-
-# O instalación manual:
-npm install && cd frontend && npm install && npm run build && cd ../backend && npm install && cd ..
-```
-
-**Windows - Git Bash:**
-```bash
-# Si ./install.sh no funciona en Git Bash:
-# 1. Verificar que tengas Git for Windows instalado
-# 2. Probar con:
-bash install.sh
-
-# O usar instalación manual
-```
-
-**Windows - Command Prompt:**
-```cmd
-# Si install.bat no funciona:
-# 1. Ejecutar como administrador
-# 2. Verificar que Node.js esté en PATH
-# 3. Probar instalación manual paso a paso:
-npm install
-cd frontend
-npm install
-npm run build
-cd ..
-cd backend
-npm install
-cd ..
-```
-
-#### **Problemas Generales:**
-
-**La aplicación no inicia:**
-```bash
-# Verificar versión de Node.js
-node --version  # Debe ser v18+
-
-# Reinstalar dependencias
-npm clean-install
-cd backend && npm clean-install && cd ..
-cd frontend && npm clean-install && cd ..
-```
-
-**Puerto ocupado:**
-- Cambiar `PORT=4001` en `backend/.env`
-- O cerrar otras aplicaciones que usen el puerto 4000
-
-**Problemas con SQLite:**
-- La base de datos se crea automáticamente en `backend/database/turismo.db`
-- Si hay problemas, elimina la carpeta `backend/database` y reinicia la app
-
-**Problemas de permisos (Windows):**
-- Ejecutar terminal como administrador
-- Verificar que Windows Defender no esté bloqueando la instalación
-
-### 🐧 Configuración de Git Bash en Windows
-
-**¿Por qué Git Bash?**
-- ✅ Comandos consistentes entre Windows y Linux
-- ✅ Mejor compatibilidad con scripts de desarrollo
-- ✅ Soporte completo para herramientas modernas
-- ✅ Menos problemas con paths y comandos
-
-**Configuración en VS Code:**
-1. Instalar [Git for Windows](https://git-scm.com/download/win)
-2. En VS Code: `Ctrl + Shift + P`
-3. Buscar: "Terminal: Select Default Profile"
-4. Seleccionar: **"Git Bash"**
-5. Reiniciar VS Code
-
-**Verificar instalación:**
-```bash
-# En Git Bash, estos comandos deben funcionar:
-node --version
-npm --version
-git --version
-```
-
-##  Estructura del Proyecto
-
-```
-proyecto_ingesoft/
-├── 📁 frontend/              # Aplicación React
-├── 📁 backend/               # API Express
-├── 📄 package.json           # Scripts principales
-├── 📄 database_setup.sql     # Setup de BD
-├── 📄 install.sh             # Instalación automática (Linux/macOS)
-├── 📄 install.bat            # Instalación automática (Windows)
-└── 📄 README.md              # Esta guía
-```
 
 ## 🎨 Tecnologías
 
