@@ -10,7 +10,7 @@
 ---
 
 ```javascript
-const equipo = [
+const teamSobrecupo = [
   {
     nombre: "David Ladino",
     correo: "jladinot@unal.edu.co",
@@ -49,14 +49,15 @@ Este repositorio contiene el desarrollo completo del proyecto del curso **Ingeni
 .
 ├── .gitignore
 ├── README.md
-├── documentacion
+├── Documentacion
 │ ├── historias_de_usuario/
-│ ├── casos_de_uso/
-│ ├── proyecto/
-│ ├── diagramas/
+│ ├── Casos de uso/
+│ ├── Proyecto/
+│ ├── Proyecto.pdf
+│ ├── README.md
 │ └── ...
-├── asignaciones/
-├── proyecto/
+├── Asignaciones/
+├── Proyecto/
 └── ...
 
 ```
@@ -87,11 +88,11 @@ Este repositorio contiene el desarrollo completo del proyecto del curso **Ingeni
 
 | Sprint | Objetivo                                 | Estado      |
 |--------|------------------------------------------|-------------|
-| 1      | Recolección y análisis de requerimientos | ⬜ Pendiente |
-| 2      | Diseño de arquitectura y diagramas       | ⬜ Pendiente |
-| 3      | Desarrollo del MVP                       | ⬜ Pendiente |
+| 1      | Recolección y análisis de requerimientos | ✅Realizado |
+| 2      | Clean Code                               | ❌Pendiente |
 
-> *Actualizado: [6/10/2025]*
+
+> *Actualizado: [14/07/2025]*
 
 <!--
 ---
