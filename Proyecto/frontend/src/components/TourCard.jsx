@@ -1,9 +1,18 @@
 import { Link } from 'react-router-dom'
 import { useState, useEffect } from 'react'
-import { Heart, Trash2, Calendar, MapPin, User } from 'lucide-react'
+import { Heart, Calendar, MapPin, User, Trash2 } from 'lucide-react'
 
-export default function TourCard({ post, user, token, onToggleFavorite, onDelete, isDetailView = false }) {
+export default function TourCard({ post, user, userId, token, onToggleFavorite, onDelete, isDetailView = false }) {
   const [fav, setFav] = useState(post.is_favorite)
+  
+  // Debug temporal - solo mostrar cuando hay onDelete
+  if (onDelete) {
+    console.log('Post:', post.id, post.title)
+    console.log('userId:', userId, '(tipo:', typeof userId, ')')
+    console.log('post.user_id:', post.user_id, '(tipo:', typeof post.user_id, ')')
+    console.log('¿Son iguales?:', String(post.user_id) === String(userId))
+    console.log('---')
+  }
   
   // Actualizar estado local cuando cambie el prop
   useEffect(() => {
@@ -69,7 +78,21 @@ export default function TourCard({ post, user, token, onToggleFavorite, onDelete
       <div className="card-content">
         <div className="card-header">
           {isDetailView ? (
-            <h1 className="card-title detail">{post.title}</h1>
+            <>
+              <div className="detail-header">
+                <h1 className="card-title detail">{post.title}</h1>
+                {user && userId && String(post.user_id) === String(userId) && onDelete && (
+                  <button 
+                    className="delete-post-btn"
+                    onClick={() => onDelete(post.id)}
+                    title="Eliminar post"
+                  >
+                    <Trash2 size={20} />
+                    <span>Eliminar Post</span>
+                  </button>
+                )}
+              </div>
+            </>
           ) : (
             <h3 className="card-title">
               <Link to={`/post/${post.id}`}>{post.title}</Link>
@@ -87,6 +110,17 @@ export default function TourCard({ post, user, token, onToggleFavorite, onDelete
         {!isDetailView && (
           <p className="card-description">{post.description}</p>
         )}
+
+        {/* Mostrar palabras clave si existen */}
+        {post.keywords && post.keywords.trim() && (
+          <div className="keywords-container">
+            {post.keywords.split(',').map((keyword, index) => (
+              <span key={index} className="keyword-tag">
+                {keyword.trim()}
+              </span>
+            ))}
+          </div>
+        )}
         
         <div className="card-footer">
           <div className="card-rating">
@@ -98,32 +132,31 @@ export default function TourCard({ post, user, token, onToggleFavorite, onDelete
           </div>
           
           <div className="card-actions">
-            <div className="action-left">
-              {user && (
-                <button 
-                  className={`action-button heart-button ${fav ? 'favorito' : ''}`}
-                  onClick={handleFav}
-                  title={fav ? 'Quitar de favoritos' : 'Agregar a favoritos'}
-                >
-                  <Heart 
-                    className={`heart ${fav ? 'favorito' : ''}`}
-                    size={20}
-                    fill={fav ? 'currentColor' : 'none'}
-                  />
-                </button>
-              )}
-            </div>
-            <div className="action-right">
-              {user === post.user_name && (
-                <button 
-                  className="action-button delete-button"
-                  onClick={() => onDelete(post.id)}
-                  title="Eliminar post"
-                >
-                  <Trash2 className="trash" size={18} />
-                </button>
-              )}
-            </div>
+            {user && (
+              <button 
+                className={`action-button heart-button ${fav ? 'favorito' : ''}`}
+                onClick={handleFav}
+                title={fav ? 'Quitar de favoritos' : 'Agregar a favoritos'}
+              >
+                <Heart 
+                  className={`heart ${fav ? 'favorito' : ''}`}
+                  size={20}
+                  fill={fav ? 'currentColor' : 'none'}
+                />
+              </button>
+            )}
+            
+            {/* Botón de eliminar - temporal para testing */}
+            {onDelete && (
+              <button 
+                className="action-button delete-button"
+                onClick={() => onDelete(post.id)}
+                title="Eliminar post"
+                style={{backgroundColor: 'orange'}}
+              >
+                <Trash2 size={20} />
+              </button>
+            )}
           </div>
         </div>
       </div>

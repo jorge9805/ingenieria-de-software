@@ -52,6 +52,18 @@ async function startServer() {
     app.use('/api/comments', commentsRoutes)
     app.use('/api/favorites', favoritesRoutes)
 
+    // Endpoint temporal para debug
+    app.get('/api/debug/posts', async (req, res) => {
+      try {
+        const db = await openDB()
+        const posts = await db.all('SELECT id, title, user_id, user_name FROM posts ORDER BY id')
+        res.json(posts)
+        await db.close()
+      } catch (error) {
+        res.status(500).json({ error: error.message })
+      }
+    })
+
     const PORT = process.env.PORT || 4000
     app.listen(PORT, () => {
       console.log(`🚀 Servidor ejecutándose en http://localhost:${PORT}`)

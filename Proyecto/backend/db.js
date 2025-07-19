@@ -45,6 +45,7 @@ async function initializeDatabase() {
       title TEXT NOT NULL,
       description TEXT,
       image_url TEXT,
+      keywords TEXT, -- Palabras clave separadas por comas
       user_id INTEGER,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
@@ -74,11 +75,28 @@ async function initializeDatabase() {
     );
   `);
 
+  // Agregar la columna keywords si no existe
+  try {
+    await db.exec(`ALTER TABLE posts ADD COLUMN keywords TEXT DEFAULT '';`);
+    console.log('✅ Columna keywords agregada a la tabla posts');
+  } catch (err) {
+    // La columna ya existe, no es un error
+    if (!err.message.includes('duplicate column name')) {
+      console.error('Error agregando columna keywords:', err);
+    }
+  }
+
   // Verificar si ya hay datos, si no insertar datos de ejemplo
   const userCount = await db.get('SELECT COUNT(*) as count FROM users');
   
+  // Siempre eliminar posts existentes y crear nuevos con keywords
+  console.log('🗑️ Eliminando posts existentes...');
+  await db.run('DELETE FROM comments');
+  await db.run('DELETE FROM favorites'); 
+  await db.run('DELETE FROM posts');
+  
   if (userCount.count === 0) {
-    console.log('🌱 Insertando datos de ejemplo...');
+    console.log('🌱 Insertando usuarios de ejemplo...');
     
     // Insertar usuarios de ejemplo (contraseña: "demo123")
     await db.run(`
@@ -86,39 +104,43 @@ async function initializeDatabase() {
       ('demo_user', 'demo@turismo.com', '$2b$10$cjail1EQNXw3AdzemPAyX.yaEqD4HSHJko0p5ZSXLKe/i.EAXU5au'),
       ('turista1', 'turista@ejemplo.com', '$2b$10$8X2rY9vZ/B.fA6wL0nP3COrDx4K.5qY7mW3nR8sT1uV2pE9cF6gHm')
     `);
-
-    // Insertar posts de ejemplo
-    await db.run(`
-      INSERT INTO posts (title, description, image_url, user_id) VALUES 
-      ('Machu Picchu, Perú', 'Una de las nuevas siete maravillas del mundo, esta antigua ciudad inca ofrece vistas espectaculares y una rica historia que data del siglo XV. Ubicada en los Andes peruanos, es uno de los destinos más impresionantes del mundo.', 'https://images.unsplash.com/photo-1587595431973-160d0d94add1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80', 1),
-      ('Torre Eiffel, París', 'El icónico símbolo de París ofrece vistas panorámicas de la ciudad luz desde sus diferentes niveles. Construida en 1889, esta estructura de hierro de 330 metros de altura es uno de los monumentos más visitados del mundo.', 'https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80', 1),
-      ('Santorini, Grecia', 'Hermosas casas blancas con techos azules, atardeceres espectaculares y vistas al mar Egeo. Esta isla volcánica en el archipiélago de las Cícladas es famosa por sus pueblos pintorescos y sus increíbles puestas de sol.', 'https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80', 2),
-      ('Gran Muralla China', 'Una de las construcciones más impresionantes de la humanidad, extendiéndose por más de 21,000 kilómetros a través del territorio chino. Esta antigua fortificación ofrece vistas espectaculares y una experiencia histórica única.', 'https://images.unsplash.com/photo-1508804185872-d7badad00f7d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80', 1),
-      ('Taj Mahal, India', 'Este magnífico mausoleo de mármol blanco en Agra es considerado una de las más bellas obras maestras de la arquitectura mogol. Construido entre 1632 y 1648, es símbolo del amor eterno.', 'https://images.unsplash.com/photo-1548013146-72479768bada?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80', 2),
-      ('Coliseo Romano, Italia', 'El anfiteatro más grande jamás construido, ubicado en el centro de Roma. Esta maravilla arquitectónica del Imperio Romano podía albergar entre 50,000 y 80,000 espectadores y es un testimonio de la grandeza antigua.', 'https://images.unsplash.com/photo-1552832230-c0197dd311b5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80', 1)
-    `);
-
-    // Insertar comentarios de ejemplo
-    await db.run(`
-      INSERT INTO comments (content, rating, user_id, post_id) VALUES 
-      ('¡Increíble experiencia! Las vistas son absolutamente espectaculares y la historia del lugar es fascinante.', 5, 2, 1),
-      ('Un lugar que todos deberían visitar al menos una vez en la vida. La subida es exigente pero vale la pena.', 5, 1, 1),
-      ('París es mágico, y la Torre Eiffel es simplemente icónica. Las vistas desde arriba son impresionantes.', 4, 2, 2),
-      ('Los atardeceres en Santorini son de otro mundo. Un destino perfecto para una luna de miel.', 5, 1, 3),
-      ('La Gran Muralla es impresionante por su extensión y conservación. Una maravilla de la ingeniería antigua.', 4, 2, 4)
-    `);
-
-    // Insertar favoritos de ejemplo
-    await db.run(`
-      INSERT INTO favorites (user_id, post_id) VALUES 
-      (1, 1),
-      (1, 3),
-      (2, 2),
-      (2, 4)
-    `);
-
-    console.log('✅ Datos de ejemplo insertados exitosamente');
   }
+
+  console.log('🌱 Insertando nuevos posts con palabras clave...');
+
+  // Insertar posts de ejemplo con keywords
+  await db.run(`
+    INSERT INTO posts (title, description, image_url, keywords, user_id) VALUES 
+    ('Machu Picchu, Perú', 'Una de las nuevas siete maravillas del mundo, esta antigua ciudad inca ofrece vistas espectaculares y una rica historia que data del siglo XV. Ubicada en los Andes peruanos, es uno de los destinos más impresionantes del mundo.', 'https://images.unsplash.com/photo-1587595431973-160d0d94add1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80', 'montaña, historia, inca, aventura, trekking, unesco, patrimonio', 1),
+    ('Bali, Indonesia', 'Paraíso tropical con playas de arena blanca, templos antiguos y una cultura vibrante. Perfecto para relajarse y disfrutar de spas, yoga y la gastronomía balinesa en un entorno natural espectacular.', 'https://images.unsplash.com/photo-1537953773345-d172ccf13cf1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80', 'playa, tropical, spa, yoga, templos, relax, cultura, indonesia', 2),
+    ('Islas Maldivas', 'Atolones de coral con aguas cristalinas color turquesa y villas sobre el agua. El destino perfecto para luna de miel, buceo y desconexión total del mundo en un paraíso tropical único.', 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80', 'playa, buceo, luna de miel, lujo, coral, turquesa, villa, tropical', 1),
+    ('Torres del Paine, Chile', 'Parque nacional patagónico con montañas escarpadas, lagos glaciares y fauna única. Ideal para trekking, fotografía de naturaleza y aventuras en uno de los paisajes más dramáticos del mundo.', 'https://images.unsplash.com/photo-1544966503-7cc5ac882d5f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80', 'montaña, trekking, patagonia, glaciar, aventura, naturaleza, chile, fauna', 2),
+    ('Tokio, Japón', 'Metrópolis futurista que combina perfectamente tradición y modernidad. Desde templos antiguos hasta rascacielos brillantes, gastronomía excepcional y tecnología de vanguardia.', 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80', 'ciudad, tecnología, templos, gastronomía, moderno, tradicional, cultura, japón', 1)
+  `);
+
+  // Insertar comentarios de ejemplo
+  await db.run(`
+    INSERT INTO comments (content, rating, user_id, post_id) VALUES 
+    ('¡Increíble experiencia! Las vistas son absolutamente espectaculares y la historia del lugar es fascinante.', 5, 2, 1),
+    ('Un lugar que todos deberían visitar al menos una vez en la vida. La subida es exigente pero vale la pena.', 5, 1, 1),
+    ('Bali es mágico, perfecto para desconectar. Los templos y la cultura son impresionantes.', 5, 2, 2),
+    ('Las Maldivas superaron mis expectativas. El agua es increíblemente clara y las villas son de ensueño.', 5, 1, 3),
+    ('Torres del Paine es perfecto para los amantes de la naturaleza. Los paisajes son simplemente épicos.', 4, 2, 4),
+    ('Tokio es una ciudad que nunca duerme. La comida es increíble y la tecnología es impresionante.', 4, 1, 5)
+  `);
+
+  // Insertar favoritos de ejemplo
+  await db.run(`
+    INSERT INTO favorites (user_id, post_id) VALUES 
+    (1, 1),
+    (1, 3),
+    (2, 2),
+    (2, 4),
+    (1, 5),
+    (2, 1)
+  `);
+
+  console.log('✅ Nuevos datos con palabras clave insertados exitosamente');
 
   return db;
 }
@@ -135,9 +157,19 @@ export default {
       dbInstance = await initializeDatabase();
     }
     
+    // Debug logs
+    if (params.length > 1) {
+      console.log('DB Query SQL:', sql);
+      console.log('DB Query Params:', params);
+    }
+    
     // Para consultas SELECT
     if (sql.trim().toUpperCase().startsWith('SELECT')) {
-      return { rows: await dbInstance.all(sql, params) };
+      const result = await dbInstance.all(sql, params);
+      if (params.length > 1) {
+        console.log('DB Query Results:', result.length, 'filas');
+      }
+      return { rows: result };
     }
     
     // Para INSERT, UPDATE, DELETE

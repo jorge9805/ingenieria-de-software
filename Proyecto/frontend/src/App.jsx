@@ -20,10 +20,35 @@ function AuthRoute({ children, user, redirectTo = "/" }) {
 
 export default function App() {
   const [user, setUser] = useState(localStorage.getItem('username'))
+  const [userId, setUserId] = useState(() => {
+    // Intentar obtener el userId del localStorage primero
+    const savedUserId = localStorage.getItem('userId')
+    console.log('Inicializando userId, savedUserId:', savedUserId)
+    if (savedUserId && savedUserId !== 'undefined') return savedUserId
+    
+    // Si no existe, intentar extraerlo del token
+    const token = localStorage.getItem('token')
+    if (token) {
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]))
+        const id = payload.id
+        console.log('ID extraído del token:', id)
+        return id ? String(id) : null
+      } catch (error) {
+        console.log('No se pudo extraer userId del token')
+        return null
+      }
+    }
+    return null
+  })
   const [token, setToken] = useState(localStorage.getItem('token'))
   const [refreshPosts, setRefreshPosts] = useState(0)
-  const [isLoading, setIsLoading] = useState(true)
   const location = useLocation()
+
+  // Debug para userId
+  useEffect(() => {
+    console.log('userId actualizado:', userId)
+  }, [userId])
 
   const triggerRefresh = () => setRefreshPosts(prev => prev + 1)
 
@@ -39,15 +64,19 @@ export default function App() {
             console.log('Token malformado, limpiando...')
             localStorage.removeItem('token')
             localStorage.removeItem('username')
+            localStorage.removeItem('userId')
             setUser(null)
             setToken(null)
+            setUserId(null)
           }
         } catch (error) {
           console.log('Error verificando token, limpiando...')
           localStorage.removeItem('token')
           localStorage.removeItem('username')
+          localStorage.removeItem('userId')
           setUser(null)
           setToken(null)
+          setUserId(null)
         }
       }
     }
@@ -79,57 +108,54 @@ export default function App() {
             // Token inválido, limpiar todo
             localStorage.removeItem('token')
             localStorage.removeItem('username')
+            localStorage.removeItem('userId')
             setUser(null)
             setToken(null)
+            setUserId(null)
           }
         } catch (error) {
           // Error de conexión, limpiar sesión por seguridad
           localStorage.removeItem('token')
           localStorage.removeItem('username')
+          localStorage.removeItem('userId')
           setUser(null)
           setToken(null)
+          setUserId(null)
         }
       } else {
         // No hay token o usuario guardado
         setUser(null)
         setToken(null)
+        setUserId(null)
       }
-      
-      setIsLoading(false)
     }
 
     validateToken()
   }, [])
 
-  // Actualizar localStorage cuando cambien user/token
+  // Actualizar localStorage cuando cambien user/token/userId
   useEffect(() => {
     if (user && token) {
       localStorage.setItem('username', user)
       localStorage.setItem('token', token)
+      if (userId) {
+        localStorage.setItem('userId', userId)
+      }
     } else {
       localStorage.removeItem('username')
       localStorage.removeItem('token')
+      localStorage.removeItem('userId')
     }
-  }, [user, token])
+  }, [user, token, userId])
 
   // Logout function
   const handleLogout = () => {
     setUser(null)
+    setUserId(null)
     setToken(null)
     localStorage.removeItem('username')
     localStorage.removeItem('token')
-  }
-
-  // Mostrar loading mientras se valida el token
-  if (isLoading) {
-    return (
-      <div className="app-loading">
-        <div className="loading-container">
-          <div className="loading-spinner large"></div>
-          <p>Cargando aplicación...</p>
-        </div>
-      </div>
-    )
+    localStorage.removeItem('userId')
   }
 
   return (
@@ -149,6 +175,7 @@ export default function App() {
             element={
               <Home 
                 user={user} 
+                userId={userId}
                 token={token} 
                 refreshPosts={refreshPosts} 
               />
@@ -160,7 +187,7 @@ export default function App() {
             path="/login" 
             element={
               <AuthRoute user={user}>
-                <Login setUser={setUser} setToken={setToken} />
+                <Login setUser={setUser} setToken={setToken} setUserId={setUserId} />
               </AuthRoute>
             } 
           />
@@ -168,7 +195,7 @@ export default function App() {
             path="/register" 
             element={
               <AuthRoute user={user}>
-                <Register setUser={setUser} setToken={setToken} />
+                <Register setUser={setUser} setToken={setToken} setUserId={setUserId} />
               </AuthRoute>
             } 
           />
@@ -177,7 +204,7 @@ export default function App() {
           <Route 
             path="/post/:id" 
             element={
-              <PostDetail user={user} token={token} />
+              <PostDetail user={user} userId={userId} token={token} />
             } 
           />
           

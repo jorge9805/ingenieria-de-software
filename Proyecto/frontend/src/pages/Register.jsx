@@ -1,14 +1,13 @@
 import { useNavigate, Link } from 'react-router-dom'
 import { useState } from 'react'
 
-export default function Register({ setUser, setToken }) {
+export default function Register({ setUser, setToken, setUserId }) {
   const navigate = useNavigate()
   const [username, setUsername] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [error, setError] = useState(null)
-  const [isLoading, setIsLoading] = useState(false)
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -23,7 +22,6 @@ export default function Register({ setUser, setToken }) {
       return
     }
     
-    setIsLoading(true)
     setError(null)
     
     try {
@@ -39,8 +37,10 @@ export default function Register({ setUser, setToken }) {
         // Login automático tras registro
         setUser(data.username)
         setToken(data.token)
+        setUserId(String(data.id))
         localStorage.setItem('username', data.username)
         localStorage.setItem('token', data.token)
+        localStorage.setItem('userId', String(data.id))
         setError(null)
         navigate('/')
       } else {
@@ -49,8 +49,6 @@ export default function Register({ setUser, setToken }) {
     } catch (err) {
       console.error(err)
       setError('No se pudo conectar con el servidor')
-    } finally {
-      setIsLoading(false)
     }
   }
 
@@ -82,7 +80,6 @@ export default function Register({ setUser, setToken }) {
               value={username}
               onChange={e => setUsername(e.target.value)}
               required
-              disabled={isLoading}
             />
           </div>
           
@@ -95,7 +92,6 @@ export default function Register({ setUser, setToken }) {
               value={email}
               onChange={e => setEmail(e.target.value)}
               required
-              disabled={isLoading}
             />
           </div>
           
@@ -108,7 +104,6 @@ export default function Register({ setUser, setToken }) {
               value={password}
               onChange={e => setPassword(e.target.value)}
               required
-              disabled={isLoading}
               minLength={6}
             />
           </div>
@@ -122,23 +117,14 @@ export default function Register({ setUser, setToken }) {
               value={confirmPassword}
               onChange={e => setConfirmPassword(e.target.value)}
               required
-              disabled={isLoading}
             />
           </div>
           
           <button 
             type="submit" 
-            className={`auth-button ${isLoading ? 'loading' : ''}`}
-            disabled={isLoading}
+            className="auth-button"
           >
-            {isLoading ? (
-              <>
-                <span className="spinner"></span>
-                Creando cuenta...
-              </>
-            ) : (
-              'Crear Cuenta'
-            )}
+            Crear Cuenta
           </button>
           
           <div className="auth-footer">

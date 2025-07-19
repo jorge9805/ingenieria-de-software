@@ -4,13 +4,12 @@ import ConfirmModal from '../components/ConfirmModal'
 import { useSearchParams } from 'react-router-dom'
 import { Search, X } from 'lucide-react'
 
-export default function Home({ user, userId, token, refreshPosts }) {
+export default function Home({ user, token, refreshPosts }) {
   const [posts, setPosts] = useState([])
   const [myComments, setMyComments] = useState([])
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [postToDelete, setPostToDelete] = useState(null)
   const [searchTerm, setSearchTerm] = useState('')
-  const [isInitialLoad, setIsInitialLoad] = useState(true)
   const [searchParams] = useSearchParams()
   const filter = searchParams.get('filter')
 
@@ -18,20 +17,13 @@ export default function Home({ user, userId, token, refreshPosts }) {
     try {
       let url = 'http://localhost:4000/api/posts'
       
-      // Si hay búsqueda y estamos en la pestaña de explorar, usar ruta específica de búsqueda
-      if (search && search.trim() && filter !== 'favorites' && filter !== 'myposts') {
+      // Si hay búsqueda, usar ruta específica de búsqueda
+      if (search && search.trim()) {
         url = `http://localhost:4000/api/posts/search?q=${encodeURIComponent(search.trim())}`
       } else {
-        // Sin búsqueda o en otras pestañas, aplicar filtros normales
+        // Sin búsqueda, aplicar filtros normales
         if (filter === 'favorites') url = 'http://localhost:4000/api/favorites'
         if (filter === 'myposts') url = 'http://localhost:4000/api/posts/my'
-      }
-      
-      // Para favoritos y mis posts, requerir token
-      if ((filter === 'favorites' || filter === 'myposts') && !token) {
-        setPosts([])
-        setIsInitialLoad(false)
-        return
       }
       
       // Construir headers condicionalmente
@@ -43,26 +35,18 @@ export default function Home({ user, userId, token, refreshPosts }) {
       const res = await fetch(url, { headers })
       
       if (!res.ok) {
-        setPosts([])
-        setIsInitialLoad(false)
         return
       }
       
       const data = await res.json()
       setPosts(data)
-      setIsInitialLoad(false)
     } catch (error) {
       console.error('Error fetching posts:', error)
-      setPosts([])
-      setIsInitialLoad(false)
     }
   }
 
   const fetchMyComments = async () => {
-    if (!token) {
-      setMyComments([])
-      return
-    }
+    if (!token || filter !== 'myposts') return
     
     try {
       const res = await fetch('http://localhost:4000/api/comments/my', {
@@ -74,25 +58,16 @@ export default function Home({ user, userId, token, refreshPosts }) {
       if (res.ok) {
         const data = await res.json()
         setMyComments(data)
-      } else {
-        const errorText = await res.text()
-        console.error('Error response:', res.status, errorText)
-        setMyComments([])
       }
     } catch (error) {
       console.error('Error fetching my comments:', error)
-      setMyComments([])
     }
   }
 
   useEffect(() => { 
-    // Marcar como carga inicial
-    setIsInitialLoad(true)
-    
-    // Limpiar búsqueda cuando no esté en la pestaña de explorar
-    if (filter === 'favorites' || filter === 'myposts') {
-      setSearchTerm('')
-    }
+    // Solo limpiar contenido, sin loading
+    setPosts([]) // Limpiar posts para evitar flash de contenido anterior
+    setMyComments([]) // Limpiar comentarios
     
     // Función simple sin delays ni loading
     const fetchPostsSimple = async () => {
@@ -107,45 +82,28 @@ export default function Home({ user, userId, token, refreshPosts }) {
           headers.Authorization = `Bearer ${token}`
         }
         
-        // Para favoritos y mis posts, requerir token
-        if ((filter === 'favorites' || filter === 'myposts') && !token) {
-          setPosts([])
-          setIsInitialLoad(false)
-          return
-        }
-        
         const res = await fetch(url, { headers })
         
         if (res.ok) {
           const data = await res.json()
           setPosts(data)
-        } else {
-          setPosts([])
         }
-        
-        setIsInitialLoad(false)
       } catch (error) {
         console.error('Error fetching posts:', error)
-        setPosts([])
-        setIsInitialLoad(false)
       }
     }
     
     fetchPostsSimple()
-    
-    // Solo buscar comentarios cuando estemos en la pestaña correcta
-    if (filter === 'myposts' && token) {
-      fetchMyComments()
-    }
+    fetchMyComments()
   }, [filter, token, refreshPosts])
 
-  // Buscar cuando el usuario deje de escribir por 500ms - Solo en pestaña de explorar
+  // Buscar cuando el usuario deje de escribir por 500ms
   useEffect(() => {
-    // Solo ejecutar búsqueda si estamos en la pestaña de explorar
-    if (filter === 'favorites' || filter === 'myposts') return
-    
     const delayedSearch = setTimeout(() => {
       fetchPosts(searchTerm)
+      if (filter === 'myposts') {
+        fetchMyComments()
+      }
     }, 500)
 
     return () => clearTimeout(delayedSearch)
@@ -175,8 +133,7 @@ export default function Home({ user, userId, token, refreshPosts }) {
         body: JSON.stringify({ postId })
       })
       if (res.ok) {
-        // Solo pasar searchTerm si estamos en la pestaña de explorar
-        fetchPosts((filter === 'favorites' || filter === 'myposts') ? '' : searchTerm)
+        fetchPosts(searchTerm)
       }
     } catch (error) {
       console.error('Error toggling favorite:', error)
@@ -197,8 +154,7 @@ export default function Home({ user, userId, token, refreshPosts }) {
         headers: { Authorization:`Bearer ${token}` }
       })
       if (res.ok) {
-        // Solo pasar searchTerm si estamos en la pestaña de explorar
-        fetchPosts((filter === 'favorites' || filter === 'myposts') ? '' : searchTerm)
+        fetchPosts(searchTerm)
         
         // Mostrar mensaje de éxito
         const notification = document.createElement('div')
@@ -234,51 +190,65 @@ export default function Home({ user, userId, token, refreshPosts }) {
 
   return (
     <div className="main-container">
-      {/* Barra de búsqueda - Solo visible en la pestaña de explorar */}
-      {(filter !== 'favorites' && filter !== 'myposts') && (
-        <div className="search-container">
-          <div className="search-box">
-            <Search size={22} className="search-icon" />
-            <input
-              type="text"
-              placeholder="Buscar destinos por nombre, descripción o experiencia..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="search-input"
-            />
-            {searchTerm && (
-              <button 
-                onClick={handleClearSearch}
-                className="clear-search-btn"
-                title="Limpiar búsqueda"
-              >
-                <X size={16} />
-              </button>
-            )}
-          </div>
-          
-          {!searchTerm && (
-            <div className="search-suggestions">
-              <div className="suggestion-title">💡 Búsquedas populares</div>
-              <div className="suggestions">
-                {searchSuggestions.map((suggestion) => (
-                  <span
-                    key={suggestion}
-                    className="suggestion-tag"
-                    onClick={() => handleSuggestionClick(suggestion)}
-                  >
-                    {suggestion}
-                  </span>
-                ))}
-              </div>
-            </div>
+      {/* Barra de búsqueda */}
+      <div className="search-container">
+        <div className="search-box">
+          <Search size={22} className="search-icon" />
+          <input
+            type="text"
+            placeholder="Buscar destinos por nombre, descripción o experiencia..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="search-input"
+          />
+          {searchTerm && (
+            <button 
+              onClick={handleClearSearch}
+              className="clear-search-btn"
+              title="Limpiar búsqueda"
+            >
+              <X size={16} />
+            </button>
           )}
         </div>
-      )}
+        
+        {searchTerm && (
+          <div className={`search-info ${posts.length === 0 ? 'no-results' : ''}`}>
+            {posts.length === 0 ? (
+              <>
+                🔍 No se encontraron destinos para "<strong>{searchTerm}</strong>"
+                <br />
+                <small>Intenta con otros términos como: playa, montaña, aventura, cultura...</small>
+              </>
+            ) : (
+              <>
+                ✨ Encontrados <strong>{posts.length}</strong> destino(s) para "<strong>{searchTerm}</strong>"
+              </>
+            )}
+          </div>
+        )}
+        
+        {!searchTerm && (
+          <div className="search-suggestions">
+            <div className="suggestion-title">💡 Búsquedas populares</div>
+            <div className="suggestions">
+              {searchSuggestions.map((suggestion) => (
+                <span
+                  key={suggestion}
+                  className="suggestion-tag"
+                  onClick={() => handleSuggestionClick(suggestion)}
+                >
+                  {suggestion}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* Contenido principal */}
-      {!isInitialLoad && posts.length === 0 ? (
-        <div className={`empty-state ${filter === 'favorites' ? 'favorites-empty' : ''}`}>
+      {posts.length === 0 ? (
+        <div className="empty-state">
           <div className="empty-icon">
             {searchTerm ? '🔍' : filter === 'favorites' ? '❤️' : filter === 'myposts' ? '📝' : '🌎'}
           </div>
@@ -314,9 +284,9 @@ export default function Home({ user, userId, token, refreshPosts }) {
             </div>
           )}
         </div>
-      ) : !isInitialLoad && posts.length > 0 ? (
+      ) : (
         <>
-          <div className={`page-header ${filter === 'favorites' ? 'favorites-header' : ''}`}>
+          <div className="page-header">
             <h1>
               {filter === 'favorites' 
                 ? '❤️ Tus Destinos Favoritos' 
@@ -340,7 +310,6 @@ export default function Home({ user, userId, token, refreshPosts }) {
                 key={post.id}
                 post={post}
                 user={user}
-                userId={userId}
                 token={token}
                 onToggleFavorite={toggleFav}
                 onDelete={deletePost}
@@ -348,10 +317,10 @@ export default function Home({ user, userId, token, refreshPosts }) {
             ))}
           </div>
         </>
-      ) : null}
+      )}
 
       {/* Sección de Mis Comentarios - Solo visible en la pestaña "myposts" */}
-      {filter === 'myposts' && !isInitialLoad && (
+      {filter === 'myposts' && (
         <div className="my-comments-section">
           <div className="section-header">
             <h2>💬 Mis Comentarios</h2>

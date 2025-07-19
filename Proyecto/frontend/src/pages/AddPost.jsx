@@ -5,6 +5,7 @@ export default function AddPost({ user, token, onPostCreated }) {
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [image, setImage] = useState('')
+  const [keywords, setKeywords] = useState('')
   const [error, setError] = useState(null)
   const navigate = useNavigate()
 
@@ -36,7 +37,7 @@ export default function AddPost({ user, token, onPostCreated }) {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ title, description, image_url: image })
+        body: JSON.stringify({ title, description, image_url: image, keywords })
       })
 
       const data = await res.json()
@@ -78,6 +79,15 @@ export default function AddPost({ user, token, onPostCreated }) {
         onChange={e => setImage(e.target.value)}
         required
       />
+      <input
+        type="text"
+        placeholder="Palabras clave (ej: playa, tropical, relax) - Opcional"
+        value={keywords}
+        onChange={e => setKeywords(e.target.value)}
+      />
+      <small style={{ color: '#666', marginTop: '5px', display: 'block' }}>
+        Separa las palabras clave con comas para facilitar la búsqueda
+      </small>
       <button type="submit">Publicar</button>
     </form>
   )

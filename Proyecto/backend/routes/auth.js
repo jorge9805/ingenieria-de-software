@@ -53,7 +53,7 @@ router.post('/login', async (req, res) => {
     if (!match) return res.status(401).json({ error: 'Contraseña incorrecta' });
 
     const token = jwt.sign({ id: user.id, username: user.username }, SECRET, { expiresIn: '7d' });
-    res.json({ token, username: user.username });
+    res.json({ token, username: user.username, id: user.id });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Error al iniciar sesión' });

@@ -1,16 +1,14 @@
 import { useNavigate, Link } from 'react-router-dom'
 import { useState } from 'react'
 
-export default function Login({ setUser, setToken }) {
+export default function Login({ setUser, setToken, setUserId }) {
   const navigate = useNavigate()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState(null)
-  const [isLoading, setIsLoading] = useState(false)
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    setIsLoading(true)
     setError(null)
     
     try {
@@ -25,8 +23,10 @@ export default function Login({ setUser, setToken }) {
       if (res.ok) {
         setUser(data.username)
         setToken(data.token)
+        setUserId(String(data.id))
         localStorage.setItem('token', data.token)
         localStorage.setItem('username', data.username)
+        localStorage.setItem('userId', String(data.id))
         setError(null)
         navigate('/')
       } else {
@@ -35,8 +35,6 @@ export default function Login({ setUser, setToken }) {
     } catch (err) {
       console.error(err)
       setError('No se pudo conectar con el servidor')
-    } finally {
-      setIsLoading(false)
     }
   }
 
@@ -68,7 +66,6 @@ export default function Login({ setUser, setToken }) {
               value={email}
               onChange={e => setEmail(e.target.value)}
               required
-              disabled={isLoading}
             />
           </div>
           
@@ -81,23 +78,14 @@ export default function Login({ setUser, setToken }) {
               value={password}
               onChange={e => setPassword(e.target.value)}
               required
-              disabled={isLoading}
             />
           </div>
           
           <button 
             type="submit" 
-            className={`auth-button ${isLoading ? 'loading' : ''}`}
-            disabled={isLoading}
+            className="auth-button"
           >
-            {isLoading ? (
-              <>
-                <span className="spinner"></span>
-                Iniciando sesión...
-              </>
-            ) : (
-              'Iniciar Sesión'
-            )}
+            Iniciar Sesión
           </button>
           
           <div className="auth-footer">

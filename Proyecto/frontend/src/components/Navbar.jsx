@@ -54,7 +54,7 @@ export default function Navbar({ user, setUser, setToken, onLogout, currentPath 
               to="/?filter=myposts" 
               className={isActive('/?filter=myposts') ? 'active' : ''}
             >
-              📝 Mis Posts
+              📝 Mis Posts/Comentarios
             </Link>
             <Link 
               to="/add-post" 

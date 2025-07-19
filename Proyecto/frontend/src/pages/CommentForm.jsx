@@ -8,7 +8,6 @@ export default function CommentForm({ user, token }) {
   const [hoverRating, setHoverRating] = useState(0)
   const [comment_text, setCommentText] = useState('')
   const [error, setError] = useState(null)
-  const [isLoading, setIsLoading] = useState(false)
   const [post, setPost] = useState(null)
   const navigate = useNavigate()
 
@@ -53,7 +52,6 @@ export default function CommentForm({ user, token }) {
       return
     }
 
-    setIsLoading(true)
     setError(null)
 
     try {
@@ -79,8 +77,6 @@ export default function CommentForm({ user, token }) {
     } catch (err) {
       console.error('Error de red:', err)
       setError('Error al conectar con el servidor')
-    } finally {
-      setIsLoading(false)
     }
   }
 
@@ -97,7 +93,6 @@ export default function CommentForm({ user, token }) {
           onClick={() => setRating(starValue)}
           onMouseEnter={() => setHoverRating(starValue)}
           onMouseLeave={() => setHoverRating(0)}
-          disabled={isLoading}
         >
           <Star 
             size={24} 
@@ -167,7 +162,6 @@ export default function CommentForm({ user, token }) {
               value={comment_text}
               onChange={e => setCommentText(e.target.value)}
               rows={6}
-              disabled={isLoading}
               maxLength={1000}
             />
             <div className="char-counter">
@@ -188,20 +182,11 @@ export default function CommentForm({ user, token }) {
             </Link>
             <button 
               type="submit" 
-              className={`btn btn-primary ${isLoading ? 'loading' : ''}`}
-              disabled={isLoading || !comment_text.trim()}
+              className="btn btn-primary"
+              disabled={!comment_text.trim()}
             >
-              {isLoading ? (
-                <>
-                  <span className="spinner"></span>
-                  Enviando...
-                </>
-              ) : (
-                <>
-                  <Send size={18} />
-                  Publicar comentario
-                </>
-              )}
+              <Send size={18} />
+              Publicar comentario
             </button>
           </div>
         </form>
