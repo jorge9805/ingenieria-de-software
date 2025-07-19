@@ -23,6 +23,10 @@ export default function Navbar({ user, setUser, setToken, onLogout, currentPath 
     if (path === '/') {
       return location.pathname === '/' && !location.search
     }
+    if (path.includes('filter=all')) {
+      // "🌍 Explorar" está activo cuando no hay filtro o cuando filter=all
+      return location.pathname === '/' && (!location.search || location.search.includes('filter=all'))
+    }
     if (path.includes('filter=')) {
       return location.search.includes(path.split('?')[1])
     }
@@ -37,7 +41,7 @@ export default function Navbar({ user, setUser, setToken, onLogout, currentPath 
       
       <div className="actions">
         <Link 
-          to="/?filter=all" 
+          to="/" 
           className={isActive('/?filter=all') ? 'active' : ''}
         >
           🌍 Explorar

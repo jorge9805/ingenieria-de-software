@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import TourCard from '../components/TourCard'
 import ConfirmModal from '../components/ConfirmModal'
-import { useSearchParams } from 'react-router-dom'
+import { useSearchParams, Link } from 'react-router-dom'
 import { Search, X } from 'lucide-react'
 
 export default function Home({ user, userId, token, refreshPosts }) {
@@ -234,6 +234,35 @@ export default function Home({ user, userId, token, refreshPosts }) {
 
   return (
     <div className="main-container">
+      {/* Banner de exploración - Solo para usuarios no logueados */}
+      {!user && (
+        <div className="guest-banner">
+          <div className="banner-content">
+            <h1>🌍 Explora el Mundo Sin Límites</h1>
+            <p>Descubre 3 destinos increíbles. ¡Únete para guardar favoritos, comentar y compartir tus propias aventuras!</p>
+            
+            <div className="features-grid">
+              <div className="feature">
+                <span className="feature-icon">💙</span>
+                <span>Guarda favoritos</span>
+              </div>
+              <div className="feature">
+                <span className="feature-icon">💬</span>
+                <span>Deja comentarios</span>
+              </div>
+              <div className="feature">
+                <span className="feature-icon">📸</span>
+                <span>Comparte destinos</span>
+              </div>
+              <div className="feature">
+                <span className="feature-icon">⭐</span>
+                <span>Califica experiencias</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Barra de búsqueda - Solo visible en la pestaña de explorar */}
       {(filter !== 'favorites' && filter !== 'myposts') && (
         <div className="search-container">
@@ -322,7 +351,8 @@ export default function Home({ user, userId, token, refreshPosts }) {
                 ? '❤️ Tus Destinos Favoritos' 
                 : filter === 'myposts' 
                 ? '📝 Mis Publicaciones'
-                : '🌍 Descubre Destinos Increíbles'
+                : user ? '🌍 Descubre Destinos Increíbles'
+                : '🌍 Explora el Mundo Sin Límites'
               }
             </h1>
             <p>
@@ -330,7 +360,8 @@ export default function Home({ user, userId, token, refreshPosts }) {
                 ? `${posts.length} destinos que amas` 
                 : filter === 'myposts' 
                 ? `${posts.length} destinos compartidos`
-                : `${posts.length} destinos esperándote`
+                : user ? `${posts.length} destinos esperándote`
+                : `Descubre ${posts.length} destinos increíbles`
               }
             </p>
           </div>
@@ -343,7 +374,9 @@ export default function Home({ user, userId, token, refreshPosts }) {
                 userId={userId}
                 token={token}
                 onToggleFavorite={toggleFav}
-                onDelete={deletePost}
+                onDelete={filter === 'myposts' ? deletePost : null}
+                currentFilter={filter}
+                showDeleteButton={filter === 'myposts'}
               />
             ))}
           </div>

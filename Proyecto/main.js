@@ -8,6 +8,120 @@ const fs = require('fs');
 let backendProcess;
 let mainWindow;
 let frontendServer;
+let viteProcess;
+
+// Función para iniciar el servidor Vite
+function startViteServer() {
+  return new Promise((resolve, reject) => {
+    console.log('🚀 Iniciando servidor Vite...');
+    
+    const isWindows = process.platform === 'win32';
+    const command = isWindows ? 'npm.cmd' : 'npm';
+    const args = ['run', 'dev'];
+    
+    const viteProc = spawn(command, args, {
+      cwd: path.join(__dirname, 'frontend'),
+      shell: true,
+      stdio: ['ignore', 'pipe', 'pipe']
+    });
+    
+    let hasStarted = false;
+    let startupOutput = '';
+    
+    // Timeout para evitar espera infinita
+    const timeout = setTimeout(() => {
+      if (!hasStarted) {
+        hasStarted = true;
+        reject(new Error('Timeout: Vite tardó demasiado en iniciar (30s)'));
+      }
+    }, 30000);
+    
+    viteProc.stdout.on('data', (data) => {
+      const output = data.toString();
+      startupOutput += output;
+      console.log(`Vite: ${output}`);
+      
+      // Buscar señales de que Vite está listo
+      if (output.includes('ready in') || output.includes('Local:   http://localhost:5173')) {
+        if (!hasStarted) {
+          hasStarted = true;
+          clearTimeout(timeout);
+          console.log('✅ Vite iniciado correctamente');
+          resolve(viteProc);
+        }
+      }
+    });
+    
+    viteProc.stderr.on('data', (data) => {
+      const error = data.toString();
+      console.error(`Vite Error: ${error}`);
+      
+      // Si hay errores críticos, rechazar
+      if (error.includes('EADDRINUSE')) {
+        if (!hasStarted) {
+          hasStarted = true;
+          clearTimeout(timeout);
+          reject(new Error(`Puerto 5173 ocupado. Error: ${error}`));
+        }
+      }
+    });
+    
+    viteProc.on('error', (error) => {
+      if (!hasStarted) {
+        hasStarted = true;
+        clearTimeout(timeout);
+        reject(new Error(`Error al ejecutar npm run dev: ${error.message}`));
+      }
+    });
+    
+    viteProc.on('exit', (code) => {
+      if (!hasStarted && code !== 0) {
+        hasStarted = true;
+        clearTimeout(timeout);
+        reject(new Error(`Vite salió con código ${code}. Output: ${startupOutput}`));
+      }
+    });
+  });
+}
+
+// Función para verificar si Vite está ejecutándose
+function checkViteHealth(maxRetries = 10, delay = 1000) {
+  return new Promise((resolve, reject) => {
+    let retries = 0;
+    
+    const check = () => {
+      const req = http.get('http://localhost:5173', (res) => {
+        console.log('✅ Vite está respondiendo');
+        resolve(true);
+      });
+      
+      req.on('error', () => {
+        retries++;
+        if (retries >= maxRetries) {
+          console.error('❌ Vite no está respondiendo después de', maxRetries, 'intentos');
+          reject(new Error('Vite no disponible'));
+        } else {
+          console.log(`🔄 Intento ${retries}/${maxRetries} - Esperando Vite...`);
+          setTimeout(check, delay);
+        }
+      });
+      
+      req.setTimeout(2000, () => {
+        req.destroy();
+        retries++;
+        if (retries >= maxRetries) {
+          console.error('❌ Vite no está respondiendo después de', maxRetries, 'intentos');
+          reject(new Error('Vite no disponible'));
+        } else {
+          console.log(`🔄 Intento ${retries}/${maxRetries} - Esperando Vite...`);
+          setTimeout(check, delay);
+        }
+      });
+    };
+    
+    check();
+  });
+}
 
 // Función para iniciar el backend
 function startBackend() {
@@ -215,7 +329,7 @@ function createWindow() {
   });
 
   // Cargar la aplicación desde el servidor web local
-  const frontendUrl = 'http://localhost:3000';
+  const frontendUrl = 'http://localhost:5173';
   mainWindow.loadURL(frontendUrl).catch(err => {
     console.error('Error cargando la aplicación:', err);
   });
@@ -301,9 +415,13 @@ app.whenReady().then(async () => {
   try {
     console.log('Iniciando aplicación TurismoApp...');
     
+    // Iniciar Vite primero
+    viteProcess = await startViteServer();
+    await checkViteHealth();
+    
+    // Luego iniciar backend
     backendProcess = await startBackend();
     await checkBackendHealth();
-    await startFrontendServer();
 
     createMenu();
     createWindow();
@@ -331,6 +449,14 @@ function cleanup() {
       spawn('taskkill', ['/pid', backendProcess.pid, '/f', '/t'], { shell: true });
     } else {
       backendProcess.kill('SIGTERM');
+    }
+  }
+  
+  if (viteProcess) {
+    if (process.platform === 'win32') {
+      spawn('taskkill', ['/pid', viteProcess.pid, '/f', '/t'], { shell: true });
+    } else {
+      viteProcess.kill('SIGTERM');
     }
   }
   

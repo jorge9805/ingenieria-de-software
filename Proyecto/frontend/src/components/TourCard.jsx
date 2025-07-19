@@ -2,8 +2,11 @@ import { Link } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import { Heart, Calendar, MapPin, User, Trash2 } from 'lucide-react'
 
-export default function TourCard({ post, user, userId, token, onToggleFavorite, onDelete, isDetailView = false }) {
+export default function TourCard({ post, user, userId, token, onToggleFavorite, onDelete, isDetailView = false, currentFilter, showDeleteButton = false }) {
   const [fav, setFav] = useState(post.is_favorite)
+  
+  // Debug para ver los props
+  console.log('TourCard - currentFilter:', currentFilter, 'showDeleteButton:', showDeleteButton, 'onDelete:', !!onDelete)
   
   // Debug temporal - solo mostrar cuando hay onDelete
   if (onDelete) {
@@ -146,13 +149,12 @@ export default function TourCard({ post, user, userId, token, onToggleFavorite, 
               </button>
             )}
             
-            {/* Botón de eliminar - temporal para testing */}
-            {onDelete && (
+            {/* Botón de eliminar - Solo en pestaña "Mis Posts" y para el autor */}
+            {showDeleteButton && onDelete && user && userId && String(post.user_id) === String(userId) && (
               <button 
                 className="action-button delete-button"
                 onClick={() => onDelete(post.id)}
                 title="Eliminar post"
-                style={{backgroundColor: 'orange'}}
               >
                 <Trash2 size={20} />
               </button>

@@ -16,6 +16,7 @@ export default function PostDetail({ user, userId, token }) {
   const [isUpdating, setIsUpdating] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [commentToDelete, setCommentToDelete] = useState(null)
+  const [showDeletePostModal, setShowDeletePostModal] = useState(false)
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -189,6 +190,56 @@ export default function PostDetail({ user, userId, token }) {
     setCommentToDelete(null)
   }
 
+  // Funciones para eliminar post
+  const handleDeletePost = () => {
+    setShowDeletePostModal(true)
+  }
+
+  const handleConfirmDeletePost = async () => {
+    try {
+      const res = await fetch(`http://localhost:4000/api/posts/${id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      
+      if (res.ok) {
+        // Mostrar mensaje de éxito y redirigir
+        const notification = document.createElement('div')
+        notification.textContent = '🗑️ Post eliminado correctamente'
+        notification.style.cssText = `
+          position: fixed;
+          top: 20px;
+          right: 20px;
+          background: #ff6b6b;
+          color: white;
+          padding: 12px 20px;
+          border-radius: 8px;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+          z-index: 1000;
+          font-weight: 600;
+        `
+        document.body.appendChild(notification)
+        
+        // Redirigir después de un breve delay
+        setTimeout(() => {
+          notification.remove()
+          navigate('/?filter=myposts')
+        }, 2000)
+      } else {
+        throw new Error('No se pudo eliminar el post')
+      }
+    } catch (error) {
+      console.error('Error eliminando post:', error)
+      alert('Error al eliminar el post')
+    } finally {
+      setShowDeletePostModal(false)
+    }
+  }
+
+  const handleCancelDeletePost = () => {
+    setShowDeletePostModal(false)
+  }
+
   // Función para renderizar estrellas de rating
   const renderStars = (rating) => {
     if (!rating) return null
@@ -295,6 +346,7 @@ export default function PostDetail({ user, userId, token }) {
             userId={userId}
             token={token} 
             onToggleFavorite={handleToggleFavorite}
+            onDelete={handleDeletePost}
             isDetailView={true}
           />
           
@@ -439,6 +491,17 @@ export default function PostDetail({ user, userId, token }) {
         title="Eliminar comentario"
         message="¿Estás seguro de que quieres eliminar este comentario? Esta acción no se puede deshacer."
         confirmText="Eliminar"
+        cancelText="Cancelar"
+      />
+
+      {/* Modal de confirmación para eliminar post */}
+      <ConfirmModal
+        isOpen={showDeletePostModal}
+        onConfirm={handleConfirmDeletePost}
+        onClose={handleCancelDeletePost}
+        title="Eliminar post"
+        message="¿Estás seguro de que quieres eliminar este post? Esta acción no se puede deshacer y se eliminarán también todos los comentarios asociados."
+        confirmText="Eliminar Post"
         cancelText="Cancelar"
       />
     </div>

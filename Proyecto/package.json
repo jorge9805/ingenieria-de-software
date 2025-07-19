@@ -6,6 +6,7 @@
     "postinstall": "cd frontend && npm install && npm run build && cd ../backend && npm install",
     "start": "electron .",
     "dev": "npm run start",
+    "dev-auto": "electron .",
     "build-frontend": "cd frontend && npm run build",
     "build": "npm run build-frontend && electron-builder",
     "build:win": "npm run build-frontend && electron-builder --win",
