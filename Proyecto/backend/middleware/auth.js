@@ -20,6 +20,9 @@ export default function verifyToken(req, res, next) {
   }
 }
 
+// Alias para authenticate
+export const authenticate = verifyToken;
+
 // Middleware opcional que extrae usuario si está autenticado
 export function optionalAuth(req, res, next) {
   const authHeader = req.headers.authorization;
