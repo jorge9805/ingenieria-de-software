@@ -89,10 +89,11 @@ Este repositorio contiene el desarrollo completo del proyecto del curso **Ingeni
 | Sprint | Objetivo                                 | Estado      |
 |--------|------------------------------------------|-------------|
 | 1      | Recolección y análisis de requerimientos | ✅Realizado |
-| 2      | Clean Code                               | ❌Pendiente |
+| 2      | Clean Code                               | ✅Realizado |
+| 3      | Testing                                  | ❌Pendiente |
 
 
-> *Actualizado: [14/07/2025]*
+> *Actualizado: [21/07/2025]*
 
 <!--
 ---
