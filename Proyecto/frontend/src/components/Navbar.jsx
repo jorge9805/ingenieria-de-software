@@ -1,4 +1,5 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom'
+import { useState, useEffect, useRef } from 'react'
 
 // Importar el logo desde assets
 import ospreyLogo from '../assets/osprey-logo.png'
@@ -6,8 +7,25 @@ import ospreyLogo from '../assets/osprey-logo.png'
 export default function Navbar({ user, setUser, setToken, onLogout, currentPath }) {
   const navigate = useNavigate()
   const location = useLocation()
+  const [showUserMenu, setShowUserMenu] = useState(false)
+  const userMenuRef = useRef(null)
+
+  // Cerrar dropdown al hacer click fuera
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
+        setShowUserMenu(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [])
   
   const handleLogout = () => {
+    setShowUserMenu(false) // Cerrar el menú
     if (onLogout) {
       onLogout()
     } else {
@@ -72,12 +90,32 @@ export default function Navbar({ user, setUser, setToken, onLogout, currentPath 
 
       <div className="auth">
         {user ? (
-          <>
-            <span className="user-badge">👋 {user}</span>
-            <button onClick={handleLogout} className="logout-btn">
-              🚪 Cerrar sesión
+          <div className="user-menu-container" ref={userMenuRef}>
+            <button 
+              className="user-badge" 
+              onClick={() => setShowUserMenu(!showUserMenu)}
+            >
+              👋 {user} ▼
             </button>
-          </>
+            
+            {showUserMenu && (
+              <div className="user-dropdown">
+                <Link 
+                  to="/settings" 
+                  className="dropdown-item"
+                  onClick={() => setShowUserMenu(false)}
+                >
+                  ⚙️ Configuraciones
+                </Link>
+                <button 
+                  onClick={handleLogout} 
+                  className="dropdown-item logout-item"
+                >
+                  🚪 Cerrar sesión
+                </button>
+              </div>
+            )}
+          </div>
         ) : (
           <>
             <Link 

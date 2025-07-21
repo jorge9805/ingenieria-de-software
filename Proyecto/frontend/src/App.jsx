@@ -7,6 +7,7 @@ import Register from './pages/Register'
 import PostDetail from './pages/PostDetail'
 import AddPost from './pages/AddPost'
 import CommentForm from './pages/CommentForm'
+import Settings from './pages/Settings'
 
 // Componente para proteger rutas que requieren autenticación
 function ProtectedRoute({ children, user, redirectTo = "/" }) {
@@ -158,6 +159,12 @@ export default function App() {
     localStorage.removeItem('userId')
   }
 
+  // Función para actualizar el username
+  const handleUserUpdate = (newUsername) => {
+    setUser(newUsername)
+    localStorage.setItem('username', newUsername)
+  }
+
   return (
     <div className="app">
       <Navbar 
@@ -217,6 +224,19 @@ export default function App() {
                   user={user} 
                   token={token} 
                   onPostCreated={triggerRefresh} 
+                />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/settings" 
+            element={
+              <ProtectedRoute user={user} redirectTo="/login">
+                <Settings 
+                  user={user} 
+                  userId={userId}
+                  token={token} 
+                  onUserUpdate={handleUserUpdate}
                 />
               </ProtectedRoute>
             } 
