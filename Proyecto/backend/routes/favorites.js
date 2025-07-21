@@ -1,7 +1,7 @@
-import express from 'express'
-import db from '../db.js'
-import verifyToken from '../middleware/auth.js'
-const router = express.Router()
+import express from 'express';
+import db from '../db.js';
+import verifyToken from '../middleware/auth.js';
+const router = express.Router();
 
 // Endpoint de prueba para verificar conectividad
 router.get('/test', verifyToken, async (req, res) => {
@@ -12,7 +12,7 @@ router.get('/test', verifyToken, async (req, res) => {
     console.error('Test endpoint error:', err);
     res.status(500).json({ error: 'Test failed', details: err.message });
   }
-})
+});
 
 // Listar favoritos del usuario
 router.get('/', verifyToken, async (req, res) => {
@@ -30,8 +30,8 @@ router.get('/', verifyToken, async (req, res) => {
        GROUP BY p.id, p.title, p.description, p.image_url, p.created_at, p.user_id, u.username
        ORDER BY p.created_at DESC`,
       [req.user.id]
-    )
-    
+    );
+
     // Mapear resultados
     const posts = result.rows.map(row => ({
       id: row.post_id,
@@ -43,31 +43,31 @@ router.get('/', verifyToken, async (req, res) => {
       user_name: row.user_name,
       is_favorite: true,
       average_rating: row.average_rating || null
-    }))
-    
-    res.json(posts)
+    }));
+
+    res.json(posts);
   } catch (err) {
     console.error('Error al obtener favoritos:', err);
-    res.status(500).json({ error: 'Error al obtener favoritos', details: err.message })
+    res.status(500).json({ error: 'Error al obtener favoritos', details: err.message });
   }
-})
+});
 
 // Añadir favorito
 router.post('/', verifyToken, async (req, res) => {
-  const { postId } = req.body
+  const { postId } = req.body;
   try {
     const existing = await db.query(
-      `SELECT * FROM favorites WHERE user_id=? AND post_id=?`,
+      'SELECT * FROM favorites WHERE user_id=? AND post_id=?',
       [req.user.id, postId]
-    )
+    );
     if (existing.rows.length) {
-      return res.status(400).json({ error: 'Ya está en favoritos' })
+      return res.status(400).json({ error: 'Ya está en favoritos' });
     }
     const result = await db.query(
-      `INSERT INTO favorites (user_id, post_id) VALUES (?, ?)`,
+      'INSERT INTO favorites (user_id, post_id) VALUES (?, ?)',
       [req.user.id, postId]
-    )
-    
+    );
+
     // Obtener el favorito recién creado
     const newFavorite = await db.query(
       `SELECT f.*, p.title, p.description, p.image_url
@@ -75,25 +75,25 @@ router.post('/', verifyToken, async (req, res) => {
        JOIN posts p ON f.post_id = p.id
        WHERE f.id = ?`,
       [result.insertId]
-    )
-    
-    res.status(201).json(newFavorite.rows[0])
+    );
+
+    res.status(201).json(newFavorite.rows[0]);
   } catch (err) {
-    console.error(err)
-    res.status(500).json({ error: 'No se pudo añadir favorito' })
+    console.error(err);
+    res.status(500).json({ error: 'No se pudo añadir favorito' });
   }
-})
+});
 
 // Quitar favorito
 router.delete('/', verifyToken, async (req, res) => {
-  const { postId } = req.body
+  const { postId } = req.body;
   try {
-    await db.query(`DELETE FROM favorites WHERE user_id=? AND post_id=?`, [req.user.id, postId])
-    res.json({ removed: true })
+    await db.query('DELETE FROM favorites WHERE user_id=? AND post_id=?', [req.user.id, postId]);
+    res.json({ removed: true });
   } catch (err) {
-    console.error(err)
-    res.status(500).json({ error: 'No se pudo quitar favorito' })
+    console.error(err);
+    res.status(500).json({ error: 'No se pudo quitar favorito' });
   }
-})
+});
 
-export default router
+export default router;

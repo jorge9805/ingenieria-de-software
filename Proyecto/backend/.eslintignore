@@ -1,0 +1,27 @@
+# Dependencias
+node_modules/
+
+# Archivos de build
+dist/
+build/
+coverage/
+
+# Archivos de base de datos
+database/
+*.db
+*.sqlite
+
+# Archivos de configuración específicos
+*.min.js
+.env
+.env.local
+.env.production
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Archivos temporales
+.tmp/
+temp/

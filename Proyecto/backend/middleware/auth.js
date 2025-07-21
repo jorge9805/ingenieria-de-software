@@ -15,7 +15,7 @@ export default function verifyToken(req, res, next) {
     const decoded = jwt.verify(token, SECRET);
     req.user = decoded; // puedes usar req.user.id y req.user.username
     next();
-  } catch (err) {
+  } catch (_err) {
     res.status(403).json({ error: 'Token inválido o expirado' });
   }
 }
@@ -37,10 +37,10 @@ export function optionalAuth(req, res, next) {
   try {
     const decoded = jwt.verify(token, SECRET);
     req.user = decoded;
-  } catch (err) {
+  } catch (_err) {
     // Token inválido, continuar sin usuario
     req.user = null;
   }
-  
+
   next();
 }

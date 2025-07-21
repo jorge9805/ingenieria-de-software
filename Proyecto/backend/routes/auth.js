@@ -11,27 +11,27 @@ router.post('/register', async (req, res) => {
   const { username, email, password } = req.body;
   try {
     const hash = await bcrypt.hash(password, 10);
-    
+
     // Insertar usuario en SQLite
     const result = await db.query(
       'INSERT INTO users (username, email, password) VALUES (?, ?, ?)',
       [username, email, hash]
     );
-    
+
     // Obtener el usuario recién creado usando el insertId
     const userResult = await db.query(
       'SELECT id, username, email FROM users WHERE id = ?',
       [result.insertId]
     );
-    
+
     const user = userResult.rows[0];
     const token = jwt.sign({ id: user.id, username: user.username }, SECRET, { expiresIn: '7d' });
-    
-    res.status(201).json({ 
-      id: user.id, 
-      username: user.username, 
-      email: user.email, 
-      token 
+
+    res.status(201).json({
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      token
     });
   } catch (err) {
     console.error('Error en /register:', err);
@@ -47,11 +47,11 @@ router.post('/login', async (req, res) => {
   const { email, password } = req.body;
   try {
     const result = await db.query('SELECT * FROM users WHERE email = ?', [email]);
-    if (result.rows.length === 0) return res.status(401).json({ error: 'Usuario no encontrado' });
+    if (result.rows.length === 0) {return res.status(401).json({ error: 'Usuario no encontrado' });}
 
     const user = result.rows[0];
     const match = await bcrypt.compare(password, user.password);
-    if (!match) return res.status(401).json({ error: 'Contraseña incorrecta' });
+    if (!match) {return res.status(401).json({ error: 'Contraseña incorrecta' });}
 
     const token = jwt.sign({ id: user.id, username: user.username }, SECRET, { expiresIn: '7d' });
     res.json({ token, username: user.username, id: user.id });
@@ -65,10 +65,10 @@ router.post('/login', async (req, res) => {
 router.get('/profile', authenticate, async (req, res) => {
   try {
     const result = await db.query(
-      'SELECT id, username, email, created_at FROM users WHERE id = ?', 
+      'SELECT id, username, email, created_at FROM users WHERE id = ?',
       [req.user.id]
     );
-    
+
     if (result.rows.length === 0) {
       return res.status(404).json({ error: 'Usuario no encontrado' });
     }
@@ -84,7 +84,7 @@ router.get('/profile', authenticate, async (req, res) => {
 // Ruta para actualizar el perfil del usuario autenticado
 router.put('/update-profile', authenticate, async (req, res) => {
   const { username, email, currentPassword, newPassword } = req.body;
-  
+
   try {
     // Validaciones básicas
     if (!username || !email) {
@@ -112,7 +112,7 @@ router.put('/update-profile', authenticate, async (req, res) => {
     // Verificar si el nuevo username o email ya están en uso por otro usuario
     if (username !== user.username) {
       const usernameCheck = await db.query(
-        'SELECT id FROM users WHERE username = ? AND id != ?', 
+        'SELECT id FROM users WHERE username = ? AND id != ?',
         [username, req.user.id]
       );
       if (usernameCheck.rows.length > 0) {
@@ -122,7 +122,7 @@ router.put('/update-profile', authenticate, async (req, res) => {
 
     if (email !== user.email) {
       const emailCheck = await db.query(
-        'SELECT id FROM users WHERE email = ? AND id != ?', 
+        'SELECT id FROM users WHERE email = ? AND id != ?',
         [email, req.user.id]
       );
       if (emailCheck.rows.length > 0) {
@@ -171,7 +171,7 @@ router.put('/update-profile', authenticate, async (req, res) => {
       newToken = jwt.sign({ id: updatedUser.id, username: updatedUser.username }, SECRET, { expiresIn: '7d' });
     }
 
-    res.json({ 
+    res.json({
       message: 'Perfil actualizado correctamente',
       user: updatedUser,
       ...(newToken && { token: newToken })

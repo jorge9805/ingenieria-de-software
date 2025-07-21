@@ -27,7 +27,7 @@ async function openDB() {
 // Función para inicializar la base de datos con las tablas
 async function initializeDatabase() {
   const db = await openDB();
-  
+
   // Crear tablas si no existen
   await db.exec(`
     -- Crear tabla de usuarios
@@ -77,7 +77,7 @@ async function initializeDatabase() {
 
   // Agregar la columna keywords si no existe
   try {
-    await db.exec(`ALTER TABLE posts ADD COLUMN keywords TEXT DEFAULT '';`);
+    await db.exec('ALTER TABLE posts ADD COLUMN keywords TEXT DEFAULT \'\';');
     console.log('✅ Columna keywords agregada a la tabla posts');
   } catch (err) {
     // La columna ya existe, no es un error
@@ -88,16 +88,16 @@ async function initializeDatabase() {
 
   // Verificar si ya hay datos, si no insertar datos de ejemplo
   const userCount = await db.get('SELECT COUNT(*) as count FROM users');
-  
+
   // Siempre eliminar posts existentes y crear nuevos con keywords
   console.log('🗑️ Eliminando posts existentes...');
   await db.run('DELETE FROM comments');
-  await db.run('DELETE FROM favorites'); 
+  await db.run('DELETE FROM favorites');
   await db.run('DELETE FROM posts');
-  
+
   if (userCount.count === 0) {
     console.log('🌱 Insertando usuarios de ejemplo...');
-    
+
     // Insertar usuarios de ejemplo (contraseña: "demo123")
     await db.run(`
       INSERT INTO users (username, email, password) VALUES 
@@ -111,33 +111,31 @@ async function initializeDatabase() {
   // Insertar posts de ejemplo con keywords
   await db.run(`
     INSERT INTO posts (title, description, image_url, keywords, user_id) VALUES 
-    ('Machu Picchu, Perú', 'Una de las nuevas siete maravillas del mundo, esta antigua ciudad inca ofrece vistas espectaculares y una rica historia que data del siglo XV. Ubicada en los Andes peruanos, es uno de los destinos más impresionantes del mundo.', 'https://images.unsplash.com/photo-1587595431973-160d0d94add1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80', 'montaña, historia, inca, aventura, trekking, unesco, patrimonio', 1),
-    ('Bali, Indonesia', 'Paraíso tropical con playas de arena blanca, templos antiguos y una cultura vibrante. Perfecto para relajarse y disfrutar de spas, yoga y la gastronomía balinesa en un entorno natural espectacular.', 'https://images.unsplash.com/photo-1537953773345-d172ccf13cf1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80', 'playa, tropical, spa, yoga, templos, relax, cultura, indonesia', 2),
-    ('Islas Maldivas', 'Atolones de coral con aguas cristalinas color turquesa y villas sobre el agua. El destino perfecto para luna de miel, buceo y desconexión total del mundo en un paraíso tropical único.', 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80', 'playa, buceo, luna de miel, lujo, coral, turquesa, villa, tropical', 1),
-    ('Torres del Paine, Chile', 'Parque nacional patagónico con montañas escarpadas, lagos glaciares y fauna única. Ideal para trekking, fotografía de naturaleza y aventuras en uno de los paisajes más dramáticos del mundo.', 'https://images.unsplash.com/photo-1544966503-7cc5ac882d5f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80', 'montaña, trekking, patagonia, glaciar, aventura, naturaleza, chile, fauna', 2),
-    ('Tokio, Japón', 'Metrópolis futurista que combina perfectamente tradición y modernidad. Desde templos antiguos hasta rascacielos brillantes, gastronomía excepcional y tecnología de vanguardia.', 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80', 'ciudad, tecnología, templos, gastronomía, moderno, tradicional, cultura, japón', 1)
+    ('Caminata Espiritual en la Sierra Nevada', 'Sendero guiado por mamos Kogui con paradas para rituales y conexión con la naturaleza. Incluye refrigerio.', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTiSyBDMmdLe7FJo501eVM7-zdBxyevQ0psXA&s', 'colombia, sierra nevada, kogui, espiritual, trekking, naturaleza, caribe', 1),
+    ('Taller de Tejido Wayuu en La Guajira', 'Taller práctico de tejido de mochilas, guiado por mujeres Wayuu. Incluye materiales, refrigerio y souvenir.', 'https://artesaniasdecolombia.com.co/Documentos/Contenido/37975_mes-madre-carmen-maria-gonzalez-artesanias-colombia-2021-g.jpg', 'colombia, guajira, wayuu, tejido, cultural, artesania, caribe', 2),
+    ('Ruta Desértica a Punta Gallinas', 'Recorrido en 4x4 con guía Wayuu por paisajes desérticos, miradores, Cabo de la Vela y Punta Gallinas. Incluye almuerzo típico.', 'https://alkilautos.com/blog/wp-content/uploads/2017/08/17.08.15-Punta-Gallinas-Cabo-de-la-vela.jpg', 'colombia, desierto, guajira, aventura, 4x4, paisajes, caribe', 1),
+    ('Ruta Agroecológica Misak en el Cauca', 'Caminata guiada por cultivos de altura con explicación de técnicas tradicionales y consumo de alimentos locales.', 'https://aventurecolombia.com/wp-content/uploads/2020/11/misak-guambianos-colombie-14.jpg', 'colombia, cauca, misak, agroecologia, andes, montaña, cultural', 2),
+    ('Visita a los Hipogeos de Tierradentro', 'Recorrido por tumbas subterráneas ancestrales (hipogeos) con interpretación espiritual y cultural por guía Nasa.', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSDKxUPTNEt1eMJnQKPZV8POHG6C6ma2tFT8A&s', 'colombia, cauca, nasa, historia, arqueologia, unesco, andes', 1)
   `);
 
   // Insertar comentarios de ejemplo
   await db.run(`
     INSERT INTO comments (content, rating, user_id, post_id) VALUES 
-    ('¡Increíble experiencia! Las vistas son absolutamente espectaculares y la historia del lugar es fascinante.', 5, 2, 1),
-    ('Un lugar que todos deberían visitar al menos una vez en la vida. La subida es exigente pero vale la pena.', 5, 1, 1),
-    ('Bali es mágico, perfecto para desconectar. Los templos y la cultura son impresionantes.', 5, 2, 2),
-    ('Las Maldivas superaron mis expectativas. El agua es increíblemente clara y las villas son de ensueño.', 5, 1, 3),
-    ('Torres del Paine es perfecto para los amantes de la naturaleza. Los paisajes son simplemente épicos.', 4, 2, 4),
-    ('Tokio es una ciudad que nunca duerme. La comida es increíble y la tecnología es impresionante.', 4, 1, 5)
+    ('Una conexión total con la madre tierra. Los mamos Kogui transmiten una sabiduría profunda.', 5, 2, 1),
+    ('Aprendí mucho sobre la cultura Wayuu y me llevé una mochila hermosa que tejí yo misma.', 5, 1, 2),
+    ('El desierto de La Guajira es de otro mundo. Un viaje que te cambia la perspectiva.', 5, 2, 3),
+    ('Ver cómo cultivan los Misak de forma sostenible fue muy inspirador. ¡Y la comida deliciosa!', 4, 1, 4),
+    ('Los hipogeos son impresionantes. Un tesoro arqueológico que hay que preservar.', 5, 2, 5)
   `);
 
   // Insertar favoritos de ejemplo
   await db.run(`
     INSERT INTO favorites (user_id, post_id) VALUES 
-    (1, 1),
-    (1, 3),
-    (2, 2),
-    (2, 4),
-    (1, 5),
-    (2, 1)
+    (2, 1),
+    (1, 2),
+    (2, 3),
+    (1, 4),
+    (1, 5)
   `);
 
   console.log('✅ Nuevos datos con palabras clave insertados exitosamente');
@@ -156,13 +154,13 @@ export default {
     if (!dbInstance) {
       dbInstance = await initializeDatabase();
     }
-    
+
     // Debug logs
     if (params.length > 1) {
       console.log('DB Query SQL:', sql);
       console.log('DB Query Params:', params);
     }
-    
+
     // Para consultas SELECT
     if (sql.trim().toUpperCase().startsWith('SELECT')) {
       const result = await dbInstance.all(sql, params);
@@ -171,16 +169,16 @@ export default {
       }
       return { rows: result };
     }
-    
+
     // Para INSERT, UPDATE, DELETE
     const result = await dbInstance.run(sql, params);
-    return { 
-      rows: [], 
+    return {
+      rows: [],
       rowCount: result.changes,
-      insertId: result.lastID 
+      insertId: result.lastID
     };
   },
-  
+
   async close() {
     if (dbInstance) {
       await dbInstance.close();
