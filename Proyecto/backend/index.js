@@ -6,6 +6,8 @@ import postRoutes from './routes/posts.js'
 import authRoutes from './routes/auth.js'
 import commentsRoutes from './routes/comments.js'
 import favoritesRoutes from './routes/favorites.js'
+import profileRoutes from './routes/profile.js'
+console.log("📌 profileRoutes:", profileRoutes)
 
 dotenv.config()
 const app = express()
@@ -51,6 +53,8 @@ async function startServer() {
     app.use('/api/posts', postRoutes)
     app.use('/api/comments', commentsRoutes)
     app.use('/api/favorites', favoritesRoutes)
+    /* Rutas para el perfil */
+    app.use('/api/profile', profileRoutes)
 
     const PORT = process.env.PORT || 4000
     app.listen(PORT, () => {

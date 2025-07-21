@@ -7,6 +7,7 @@ import Register from './pages/Register'
 import PostDetail from './pages/PostDetail'
 import AddPost from './pages/AddPost'
 import CommentForm from './pages/CommentForm'
+import Profile from './pages/Profile'
 
 // Componente para proteger rutas que requieren autenticación
 function ProtectedRoute({ children, user, redirectTo = "/" }) {
@@ -182,6 +183,15 @@ export default function App() {
           />
           
           {/* Rutas protegidas - solo para usuarios logueados */}
+          <Route 
+            path="/profile"
+            element={
+              <ProtectedRoute user={user} redirectTo="/login">
+                <Profile user={user} token={token} />
+              </ProtectedRoute>
+            }
+          />
+
           <Route 
             path="/add-post" 
             element={

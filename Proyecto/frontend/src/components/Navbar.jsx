@@ -57,6 +57,12 @@ export default function Navbar({ user, setUser, setToken, onLogout, currentPath 
               📝 Mis Posts
             </Link>
             <Link 
+              to="/profile" 
+              className={isActive('/profile') ? 'active' : ''}
+            >
+              👤 Mi Perfil
+            </Link>
+            <Link 
               to="/add-post" 
               className={`add-post-btn ${isActive('/add-post') ? 'active' : ''}`}
             >

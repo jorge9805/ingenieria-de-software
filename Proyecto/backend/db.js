@@ -24,6 +24,23 @@ async function openDB() {
   });
 }
 
+// Función auxiliar: verifica si existe una columna en una tabla
+async function columnExists(db, tableName, columnName) {
+  const result = await db.all(`PRAGMA table_info(${tableName})`);
+  return result.some(col => col.name === columnName);
+}
+
+// Agregar columna solo si no existe
+async function addColumnIfNotExists(db, tableName, columnName, columnType) {
+  const exists = await columnExists(db, tableName, columnName);
+  if (!exists) {
+    await db.exec(`ALTER TABLE ${tableName} ADD COLUMN ${columnName} ${columnType}`);
+    console.log(`✅ Columna '${columnName}' agregada a la tabla '${tableName}'`);
+  } else {
+    console.log(`ℹ️ Columna '${columnName}' ya existe en '${tableName}', no se agregó.`);
+  }
+}
+
 // Función para inicializar la base de datos con las tablas
 async function initializeDatabase() {
   const db = await openDB();
@@ -73,6 +90,14 @@ async function initializeDatabase() {
       FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE
     );
   `);
+
+  // 🔹 Migraciones: agregar columnas nuevas al perfil si no existen
+  await addColumnIfNotExists(db, "users", "first_name", "TEXT");
+  await addColumnIfNotExists(db, "users", "last_name", "TEXT");
+  await addColumnIfNotExists(db, "users", "identification_document", "TEXT");
+  await addColumnIfNotExists(db, "users", "telephone", "TEXT");
+  await addColumnIfNotExists(db, "users", "address", "TEXT");
+  await addColumnIfNotExists(db, "users", "nationality", "TEXT");
 
   // Verificar si ya hay datos, si no insertar datos de ejemplo
   const userCount = await db.get('SELECT COUNT(*) as count FROM users');
