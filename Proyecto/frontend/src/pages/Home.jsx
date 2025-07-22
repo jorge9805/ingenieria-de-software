@@ -3,6 +3,7 @@ import TourCard from '../components/TourCard'
 import ConfirmModal from '../components/ConfirmModal'
 import { useSearchParams, Link } from 'react-router-dom'
 import { Search, X } from 'lucide-react'
+import { fetchWithAuth, checkServerHealth, showNotification } from '../utils/api'
 
 export default function Home({ user, userId, token, refreshPosts }) {
   const [posts, setPosts] = useState([])
@@ -34,27 +35,23 @@ export default function Home({ user, userId, token, refreshPosts }) {
         return
       }
       
-      // Construir headers condicionalmente
-      const headers = {}
-      if (token) {
-        headers.Authorization = `Bearer ${token}`
-      }
-      
-      const res = await fetch(url, { headers })
-      
-      if (!res.ok) {
-        setPosts([])
-        setIsInitialLoad(false)
-        return
-      }
-      
+      const res = await fetchWithAuth(url, token)
       const data = await res.json()
       setPosts(data)
       setIsInitialLoad(false)
     } catch (error) {
-      console.error('Error fetching posts:', error)
+      console.error('Error fetching posts:', error.message)
       setPosts([])
       setIsInitialLoad(false)
+      
+      // Verificar conectividad del servidor
+      const serverUp = await checkServerHealth()
+      if (!serverUp) {
+        console.error('Backend server appears to be down. Please ensure it\'s running on http://localhost:4000')
+        showNotification('❌ No se puede conectar con el servidor. Verifica que esté ejecutándose.', 'error')
+      } else {
+        showNotification('❌ Error cargando posts. Reintentando...', 'error')
+      }
     }
   }
 
@@ -65,23 +62,13 @@ export default function Home({ user, userId, token, refreshPosts }) {
     }
     
     try {
-      const res = await fetch('http://localhost:4000/api/comments/my', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      })
-      
-      if (res.ok) {
-        const data = await res.json()
-        setMyComments(data)
-      } else {
-        const errorText = await res.text()
-        console.error('Error response:', res.status, errorText)
-        setMyComments([])
-      }
+      const res = await fetchWithAuth('http://localhost:4000/api/comments/my', token)
+      const data = await res.json()
+      setMyComments(data)
     } catch (error) {
-      console.error('Error fetching my comments:', error)
+      console.error('Error fetching my comments:', error.message)
       setMyComments([])
+      showNotification('❌ Error cargando comentarios', 'error')
     }
   }
 
@@ -94,44 +81,8 @@ export default function Home({ user, userId, token, refreshPosts }) {
       setSearchTerm('')
     }
     
-    // Función simple sin delays ni loading
-    const fetchPostsSimple = async () => {
-      try {
-        let url = 'http://localhost:4000/api/posts'
-        
-        if (filter === 'favorites') url = 'http://localhost:4000/api/favorites'
-        if (filter === 'myposts') url = 'http://localhost:4000/api/posts/my'
-        
-        const headers = {}
-        if (token) {
-          headers.Authorization = `Bearer ${token}`
-        }
-        
-        // Para favoritos y mis posts, requerir token
-        if ((filter === 'favorites' || filter === 'myposts') && !token) {
-          setPosts([])
-          setIsInitialLoad(false)
-          return
-        }
-        
-        const res = await fetch(url, { headers })
-        
-        if (res.ok) {
-          const data = await res.json()
-          setPosts(data)
-        } else {
-          setPosts([])
-        }
-        
-        setIsInitialLoad(false)
-      } catch (error) {
-        console.error('Error fetching posts:', error)
-        setPosts([])
-        setIsInitialLoad(false)
-      }
-    }
-    
-    fetchPostsSimple()
+    // Usar la función fetchPosts mejorada
+    fetchPosts('')
     
     // Solo buscar comentarios cuando estemos en la pestaña correcta
     if (filter === 'myposts' && token) {
@@ -169,17 +120,17 @@ export default function Home({ user, userId, token, refreshPosts }) {
   const toggleFav = async (postId, add) => {
     try {
       const method = add ? 'POST' : 'DELETE'
-      const res = await fetch(`http://localhost:4000/api/favorites`, {
+      await fetchWithAuth(`http://localhost:4000/api/favorites`, token, {
         method,
-        headers: { 'Content-Type':'application/json', Authorization:`Bearer ${token}` },
+        headers: { 'Content-Type':'application/json' },
         body: JSON.stringify({ postId })
       })
-      if (res.ok) {
-        // Solo pasar searchTerm si estamos en la pestaña de explorar
-        fetchPosts((filter === 'favorites' || filter === 'myposts') ? '' : searchTerm)
-      }
+      
+      // Solo pasar searchTerm si estamos en la pestaña de explorar
+      fetchPosts((filter === 'favorites' || filter === 'myposts') ? '' : searchTerm)
     } catch (error) {
-      console.error('Error toggling favorite:', error)
+      console.error('Error toggling favorite:', error.message)
+      showNotification('❌ Error al cambiar favorito', 'error')
     }
   }
 
@@ -192,35 +143,17 @@ export default function Home({ user, userId, token, refreshPosts }) {
     if (!postToDelete) return
 
     try {
-      const res = await fetch(`http://localhost:4000/api/posts/${postToDelete}`, {
-        method: 'DELETE',
-        headers: { Authorization:`Bearer ${token}` }
+      await fetchWithAuth(`http://localhost:4000/api/posts/${postToDelete}`, token, {
+        method: 'DELETE'
       })
-      if (res.ok) {
-        // Solo pasar searchTerm si estamos en la pestaña de explorar
-        fetchPosts((filter === 'favorites' || filter === 'myposts') ? '' : searchTerm)
-        
-        // Mostrar mensaje de éxito
-        const notification = document.createElement('div')
-        notification.textContent = '🗑️ Post eliminado correctamente'
-        notification.style.cssText = `
-          position: fixed;
-          top: 20px;
-          right: 20px;
-          background: #ff6b6b;
-          color: white;
-          padding: 12px 20px;
-          border-radius: 8px;
-          box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-          z-index: 1000;
-          font-weight: 600;
-        `
-        document.body.appendChild(notification)
-        setTimeout(() => notification.remove(), 3000)
-      }
+      
+      // Solo pasar searchTerm si estamos en la pestaña de explorar
+      fetchPosts((filter === 'favorites' || filter === 'myposts') ? '' : searchTerm)
+      
+      showNotification('🗑️ Post eliminado correctamente', 'success')
     } catch (error) {
-      console.error('Error deleting post:', error)
-      alert('Error al eliminar el post')
+      console.error('Error deleting post:', error.message)
+      showNotification('❌ Error al eliminar el post', 'error')
     } finally {
       setShowDeleteModal(false)
       setPostToDelete(null)

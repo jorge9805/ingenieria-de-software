@@ -118,25 +118,43 @@ async function initializeDatabase() {
     ('Visita a los Hipogeos de Tierradentro', 'Recorrido por tumbas subterráneas ancestrales (hipogeos) con interpretación espiritual y cultural por guía Nasa.', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSDKxUPTNEt1eMJnQKPZV8POHG6C6ma2tFT8A&s', 'colombia, cauca, nasa, historia, arqueologia, unesco, andes', 1)
   `);
 
-  // Insertar comentarios de ejemplo
-  await db.run(`
-    INSERT INTO comments (content, rating, user_id, post_id) VALUES 
-    ('Una conexión total con la madre tierra. Los mamos Kogui transmiten una sabiduría profunda.', 5, 2, 1),
-    ('Aprendí mucho sobre la cultura Wayuu y me llevé una mochila hermosa que tejí yo misma.', 5, 1, 2),
-    ('El desierto de La Guajira es de otro mundo. Un viaje que te cambia la perspectiva.', 5, 2, 3),
-    ('Ver cómo cultivan los Misak de forma sostenible fue muy inspirador. ¡Y la comida deliciosa!', 4, 1, 4),
-    ('Los hipogeos son impresionantes. Un tesoro arqueológico que hay que preservar.', 5, 2, 5)
-  `);
+  // Obtener los IDs de los posts recién insertados para vincular correctamente los comentarios
+  const posts = await db.all('SELECT id, title FROM posts ORDER BY id');
+  console.log('📋 Posts insertados:', posts.map(p => `${p.id}: ${p.title}`));
 
-  // Insertar favoritos de ejemplo
-  await db.run(`
-    INSERT INTO favorites (user_id, post_id) VALUES 
-    (2, 1),
-    (1, 2),
-    (2, 3),
-    (1, 4),
-    (1, 5)
-  `);
+  // Insertar comentarios de ejemplo vinculados a los posts correctos
+  if (posts.length >= 5) {
+    console.log('💬 Insertando comentarios de ejemplo...');
+    await db.run(`
+      INSERT INTO comments (content, rating, user_id, post_id) VALUES 
+      ('Una conexión total con la madre tierra. Los mamos Kogui transmiten una sabiduría profunda. Experiencia inolvidable.', 5, 2, ?),
+      ('La caminata fue exigente pero valió la pena. Los rituales ancestrales son muy emotivos.', 4, 1, ?),
+      ('Aprendí mucho sobre la cultura Wayuu y me llevé una mochila hermosa que tejí yo misma. ¡Increíble!', 5, 1, ?),
+      ('Las mujeres Wayuu son maestras artesanas. El taller es muy didáctico y divertido.', 5, 2, ?),
+      ('El desierto de La Guajira es de otro mundo. Un viaje que te cambia la perspectiva.', 5, 2, ?),
+      ('Los paisajes desérticos son espectaculares. La experiencia con los guías Wayuu fue enriquecedora.', 4, 1, ?),
+      ('Ver cómo cultivan los Misak de forma sostenible fue muy inspirador. ¡Y la comida deliciosa!', 5, 1, ?),
+      ('La agricultura tradicional Misak es fascinante. Aprendí técnicas ancestrales increíbles.', 4, 2, ?),
+      ('Los hipogeos son impresionantes. Un tesoro arqueológico que hay que preservar. Muy recomendado.', 5, 2, ?),
+      ('La interpretación de los guías Nasa es excelente. Historia viva que te emociona.', 5, 1, ?)
+    `, [posts[0].id, posts[0].id, posts[1].id, posts[1].id, posts[2].id, posts[2].id, posts[3].id, posts[3].id, posts[4].id, posts[4].id]);
+  }
+
+  // Insertar favoritos de ejemplo vinculados a los posts correctos
+  if (posts.length >= 5) {
+    console.log('❤️ Insertando favoritos de ejemplo...');
+    await db.run(`
+      INSERT INTO favorites (user_id, post_id) VALUES 
+      (1, ?),
+      (2, ?),
+      (1, ?),
+      (2, ?),
+      (1, ?),
+      (2, ?),
+      (1, ?),
+      (2, ?)
+    `, [posts[0].id, posts[1].id, posts[2].id, posts[3].id, posts[4].id, posts[0].id, posts[1].id, posts[2].id]);
+  }
 
   console.log('✅ Nuevos datos con palabras clave insertados exitosamente');
 
