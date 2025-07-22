@@ -364,7 +364,12 @@ export default function PostDetail({ user, userId, token }) {
         {/* Sección de comentarios */}
         <div className="comments-section">
           <div className="comments-header">
-            <h3>💬 Mis Comentarios ({post.comments?.length || 0})</h3>
+            <h3>💬 Comentarios ({post.comments?.length || 0})</h3>
+            {user && (
+              <Link to={`/comment/${post.id}`} className="btn btn-primary">
+                Añadir comentario
+              </Link>
+            )}
           </div>
 
           {post.comments && post.comments.length > 0 ? (
@@ -462,14 +467,6 @@ export default function PostDetail({ user, userId, token }) {
               <div className="empty-icon">💭</div>
               <h4>Aún no hay comentarios</h4>
               <p>¡Sé el primero en compartir tu opinión sobre este destino!</p>
-              {user && (
-                <Link 
-                  to={`/comment/${post.id}`} 
-                  className="btn btn-primary"
-                >
-                  Escribir primer comentario
-                </Link>
-              )}
             </div>
           )}
 
