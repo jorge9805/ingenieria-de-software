@@ -309,6 +309,7 @@ function createWindow() {
     height: 800,
     minWidth: 800,
     minHeight: 600,
+    title: 'Colombia Raíces',
     show: false, // No mostrar hasta que esté listo
     webPreferences: {
       contextIsolation: true,

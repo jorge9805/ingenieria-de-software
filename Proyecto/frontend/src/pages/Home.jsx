@@ -81,8 +81,44 @@ export default function Home({ user, userId, token, refreshPosts }) {
       setSearchTerm('')
     }
     
-    // Usar la función fetchPosts mejorada
-    fetchPosts('')
+    // Función simple sin delays ni loading
+    const fetchPostsSimple = async () => {
+      try {
+        let url = 'http://localhost:4000/api/posts'
+        
+        if (filter === 'favorites') url = 'http://localhost:4000/api/favorites'
+        if (filter === 'myposts') url = 'http://localhost:4000/api/posts/my'
+        
+        const headers = {}
+        if (token) {
+          headers.Authorization = `Bearer ${token}`
+        }
+        
+        // Para favoritos y mis posts, requerir token
+        if ((filter === 'favorites' || filter === 'myposts') && !token) {
+          setPosts([])
+          setIsInitialLoad(false)
+          return
+        }
+        
+        const res = await fetch(url, { headers })
+        
+        if (res.ok) {
+          const data = await res.json()
+          setPosts(data)
+        } else {
+          setPosts([])
+        }
+        
+        setIsInitialLoad(false)
+      } catch (error) {
+        console.error('Error fetching posts:', error)
+        setPosts([])
+        setIsInitialLoad(false)
+      }
+    }
+    
+    fetchPostsSimple()
     
     // Solo buscar comentarios cuando estemos en la pestaña correcta
     if (filter === 'myposts' && token) {
