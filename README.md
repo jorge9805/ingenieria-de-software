@@ -17,7 +17,7 @@ const teamSobrecupo = [
     carrera: "Ingeniería de Sistemas y Computacion"
   },
   {
-    nombre: "Camilo D’Aleman ",
+    nombre: "Juan D’Aleman ",
     correo: "jdalemanr@unal.edu.co",
     carrera: "Ingeniería Sistemas y Computacion"
   },
