@@ -258,56 +258,7 @@ Funcionalidades críticas desarrolladas con **Test-Driven Development**:
 
 Este proyecto está desarrollado para fines educativos y de demostración. Todos los derechos reservados.
 
-## 📞 Contacto
 
-### 🏢 Información de la Organización
-
-**Colombia Raíces - Equipo de Desarrollo**
-
-- 📧 **Email Principal**: colombia.raices.dev@gmail.com
-- 🌐 **Sitio Web**: [colombiaraices.dev](https://colombiaraices.dev) _(Coming Soon)_
-- 📱 **WhatsApp**: +57 300 123 4567 _(Para soporte técnico)_
-- 💼 **LinkedIn**: [Colombia Raíces Team](https://linkedin.com/company/colombia-raices)
-
-### 🤝 Contacto por Rol
-
-| Consulta                  | Contacto                       | Horario             |
-| ------------------------- | ------------------------------ | ------------------- |
-| **Desarrollo Técnico**    | tech@colombiaraices.dev        | Lun-Vie 8AM-6PM COT |
-| **Alianzas Comunitarias** | comunidades@colombiaraices.dev | Lun-Vie 9AM-5PM COT |
-| **Soporte Usuario**       | soporte@colombiaraices.dev     | Lun-Sáb 8AM-8PM COT |
-| **Prensa y Media**        | prensa@colombiaraices.dev      | Lun-Vie 9AM-5PM COT |
-
-### 🗺️ Ubicación
-
-**Oficina Principal**
-
-- 📍 Bogotá D.C., Colombia
-- 🌎 Región: Andina
-- ⏰ Zona Horaria: GMT-5 (COT)
-
-### 🔗 Redes Sociales
-
-- 📘 **Facebook**: [@ColombiaRaicesTurismo](https://facebook.com/ColombiaRaicesTurismo)
-- 📸 **Instagram**: [@colombia_raices_oficial](https://instagram.com/colombia_raices_oficial)
-- 🐦 **Twitter**: [@ColombiaRaices](https://twitter.com/ColombiaRaices)
-- 📺 **YouTube**: [Colombia Raíces Oficial](https://youtube.com/@ColombiaRaicesOficial)
-
----
-
-## 🆘 Soporte y Documentación
-
-- **Guía de Desarrollo**: `GUIA_DESARROLLO.md`
-- **Casos de Uso**: `Casos_de_Uso_Colombia_Raices_Completo_Actualizado.markdown`
-- **Documentación Técnica**: `docs/`
-- **Bitácora de Desarrollo**: `BITACORA_DESARROLLO.md`
-- **Diagrama de Base de Datos**: `docs/database_diagram.dbml`
-
-## 🎯 Visión del Proyecto
-
-Crear una plataforma que empodere a las comunidades locales colombianas para compartir su cultura y tradiciones con el mundo, generando ingresos sostenibles y promoviendo el turismo responsable.
-
----
 
 **Desarrollado con ❤️ para las comunidades de Colombia**
 
