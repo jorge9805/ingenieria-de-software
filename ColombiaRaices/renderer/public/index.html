@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Colombia Raíces</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Loading fallback styles */
+        .app-loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            font-family: 'Inter', Arial, sans-serif;
+            background: linear-gradient(135deg, #03222b 0%, #569079 100%);
+            color: white;
+            text-align: center;
+        }
+        .loading-spinner {
+            border: 4px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top: 4px solid #fbd338;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>    <div id="root">
+        <!-- Fallback loading content -->
+        <div class="app-loading" id="loading-fallback">
+            <h1>🌟 Colombia Raíces</h1>
+            <div class="loading-spinner"></div>
+            <p>Cargando aplicación...</p>
+            <small>Sprint 11 - Sistema de Reservas</small>
+        </div>
+    </div>
+
+    <script>
+        console.log('🔍 HTML DEBUG - Page loaded');
+        console.log('📍 Root element found:', !!document.getElementById('root'));
+        
+        // Monitor for React loading
+        let loadTimeout = setTimeout(() => {
+            const fallback = document.getElementById('loading-fallback');
+            if (fallback && fallback.style.display !== 'none') {
+                console.error('❌ REACT NOT LOADED - Bundle may be missing');
+                fallback.innerHTML = `
+                    <h1>⚠️ Error de Carga</h1>
+                    <p>El bundle de JavaScript no se cargó correctamente</p>
+                    <p>Verificando servidor de desarrollo...</p>
+                    <button onclick="location.reload()" style="
+                        background: #fbd338;
+                        color: #03222b;
+                        border: none;
+                        padding: 10px 20px;
+                        border-radius: 5px;
+                        cursor: pointer;
+                        font-weight: bold;
+                        margin: 10px;
+                    ">🔄 Recargar</button>
+                `;
+            }
+        }, 5000);
+        
+        // Clear timeout when React loads
+        window.addEventListener('DOMContentLoaded', () => {
+            console.log('📄 DOM Content Loaded');
+            
+            // Check for React after a moment
+            setTimeout(() => {
+                if (window.React) {
+                    console.log('✅ React detected');
+                    clearTimeout(loadTimeout);
+                } else {
+                    console.warn('⚠️ React not detected in window');
+                }
+            }, 1000);
+        });
+    </script><script>
+        console.log('🔍 HTML template script executing...');
+        console.log('📍 Root element:', document.getElementById('root'));
+        
+        // Debug bundle loading
+        window.addEventListener('DOMContentLoaded', () => {
+            console.log('📄 DOM Content Loaded');
+            
+            // Test IPC después de que el DOM esté listo
+            setTimeout(() => {
+                console.log('🧪 Testing IPC Communication...');
+                
+                if (typeof window.electronAPI === 'undefined') {
+                  console.error('❌ electronAPI no está disponible');
+                  return;
+                }
+                
+                console.log('✅ electronAPI está disponible');
+                console.log('API Methods:', Object.keys(window.electronAPI));
+                
+                // Test básico
+                if (window.electronAPI.experiencesSimple) {
+                  console.log('✅ experiencesSimple API disponible');
+                }
+                
+                if (window.electronAPI.communities) {
+                  console.log('✅ communities API disponible');
+                }
+            }, 1000);
+        });
+        
+        window.addEventListener('load', () => {
+            console.log('🌐 Window Load Complete');
+        });
+    </script>
+</body>
+</html>

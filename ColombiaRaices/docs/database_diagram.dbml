@@ -1,0 +1,338 @@
+// DIAGRAMA DE BASE DE DATOS - COLOMBIA RAÍCES
+// Plataforma de Turismo Comunitario
+// Generado: 2025 - Sistema SQLite con Electron
+
+Project colombia_raices {
+  database_type: 'SQLite'
+  Note: '''
+  # Sistema de Turismo Comunitario - Colombia Raíces
+  
+  Base de datos diseñada para una plataforma de experiencias turísticas comunitarias
+  que conecta viajeros con comunidades locales de Colombia.
+  
+  ## Características Principales:
+  - Gestión de usuarios con roles (viajero, operador, admin)
+  - Registro de comunidades con ubicación geográfica
+  - Catálogo de experiencias turísticas por tipo
+  - Sistema de reservas con cálculo automático de precios
+  - Soporte para servicios adicionales y descuentos por grupo
+  - Geolocalización para mapas interactivos
+  '''
+}
+
+// ====================================
+// TABLA DE USUARIOS
+// ====================================
+Table users {
+  id integer [pk, increment, not null, note: 'ID único del usuario']
+  email text [unique, not null, note: 'Email único para autenticación']
+  password_hash text [not null, note: 'Hash de contraseña con bcrypt']
+  name text [not null, note: 'Nombre completo del usuario']
+  user_type text [not null, note: 'Tipo: viajero, operador, admin']
+  phone text [note: 'Teléfono opcional del usuario']
+  created_at datetime [default: `CURRENT_TIMESTAMP`, note: 'Fecha de registro']
+  updated_at datetime [default: `CURRENT_TIMESTAMP`, note: 'Última actualización']
+  is_active boolean [default: 1, note: 'Estado activo/inactivo del usuario']
+
+  Note: '''
+  Tabla principal de usuarios del sistema con tres tipos:
+  - **viajero**: Usuarios que buscan y reservan experiencias
+  - **operador**: Miembros de comunidades que publican experiencias  
+  - **admin**: Administradores que aprueban contenido
+  
+  Constraints:
+  - user_type IN ('viajero', 'operador', 'admin')
+  - email debe ser único
+  - Soft delete con is_active
+  '''
+
+  indexes {
+    email [unique]
+    user_type
+    is_active
+  }
+}
+
+// ====================================
+// TABLA DE COMUNIDADES
+// ====================================
+Table communities {
+  id integer [pk, increment, not null, note: 'ID único de la comunidad']
+  name text [not null, note: 'Nombre de la comunidad']
+  region text [not null, note: 'Región geográfica (ej: Caribe, Andina, Pacífica)']
+  description text [note: 'Descripción cultural e histórica de la comunidad']
+  contact_email text [note: 'Email de contacto de la comunidad']
+  contact_phone text [note: 'Teléfono de contacto de la comunidad']
+  address text [note: 'Dirección física de la comunidad']
+  latitude real [note: 'Coordenada latitud para mapas']
+  longitude real [note: 'Coordenada longitud para mapas']
+  image_url text [note: 'URL de la imagen principal de la comunidad']
+  image_alt text [note: 'Texto alternativo para accesibilidad']
+  created_at datetime [default: `CURRENT_TIMESTAMP`, note: 'Fecha de registro']
+  updated_at datetime [default: `CURRENT_TIMESTAMP`, note: 'Última actualización']
+  is_active boolean [default: 1, note: 'Estado activo/inactivo de la comunidad']
+
+  Note: '''
+  Registro de comunidades indígenas, afrodescendientes y campesinas
+  que participan en el turismo comunitario.
+  
+  Incluye información geográfica para:
+  - Mapas interactivos con OpenStreetMap
+  - Búsquedas por proximidad
+  - Filtrado por región
+  
+  Regiones principales de Colombia:
+  - Caribe, Andina, Pacífica, Amazónica, Orinoquía, Insular
+  '''
+
+  indexes {
+    region
+    is_active
+    (latitude, longitude) [note: 'Índice compuesto para búsquedas geográficas']
+  }
+}
+
+// ====================================
+// TABLA DE EXPERIENCIAS
+// ====================================
+Table experiences {
+  id integer [pk, increment, not null, note: 'ID único de la experiencia']
+  title text [not null, note: 'Título de la experiencia turística']
+  description text [note: 'Descripción detallada de la experiencia']
+  community_id integer [ref: > communities.id, not null, note: 'Comunidad que ofrece la experiencia']
+  operator_id integer [ref: > users.id, not null, note: 'Usuario operador responsable']
+  type text [not null, note: 'Tipo: cultural, historica, ecologica']
+  price real [not null, note: 'Precio base por persona en pesos colombianos']
+  duration_hours integer [not null, note: 'Duración en horas de la experiencia']
+  max_participants integer [not null, note: 'Máximo número de participantes permitido']
+  image_url text [note: 'URL de la imagen principal']
+  thumbnail_url text [note: 'URL de la miniatura para listados']
+  image_alt text [note: 'Texto alternativo para accesibilidad']
+  specific_location text [note: 'Ubicación específica dentro de la comunidad']
+  latitude real [note: 'Coordenada latitud específica de la experiencia']
+  longitude real [note: 'Coordenada longitud específica de la experiencia']
+  created_at datetime [default: `CURRENT_TIMESTAMP`, note: 'Fecha de creación']
+  updated_at datetime [default: `CURRENT_TIMESTAMP`, note: 'Última actualización']
+  is_active boolean [default: 1, note: 'Estado: 1=aprobada, 0=pendiente de aprobación']
+
+  Note: '''
+  Catálogo de experiencias turísticas ofrecidas por las comunidades.
+  
+  **Tipos de experiencia:**
+  - **cultural**: Talleres, danzas, gastronomía tradicional
+  - **historica**: Tours históricos, sitios arqueológicos, memoria
+  - **ecologica**: Senderismo, avistamiento, conservación
+  
+  **Proceso de aprobación:**
+  - Operador crea experiencia (is_active = 0)
+  - Administrador revisa y aprueba (is_active = 1)
+  - Solo experiencias aprobadas son visibles a viajeros
+  
+  **Geolocalización:**
+  - Hereda coordenadas de la comunidad si no tiene específicas
+  - Permite ubicación precisa en mapas interactivos
+  '''
+
+  indexes {
+    community_id
+    operator_id
+    type
+    is_active
+    price
+    (latitude, longitude) [note: 'Índice para mapas']
+  }
+}
+
+// ====================================
+// TABLA DE RESERVAS
+// ====================================
+Table reservations {
+  id integer [pk, increment, not null, note: 'ID único de la reserva']
+  experience_id integer [ref: > experiences.id, not null, note: 'Experiencia reservada']
+  user_id integer [ref: > users.id, not null, note: 'Usuario que hace la reserva']
+  participants integer [not null, note: 'Número de participantes en la reserva']
+  reservation_date datetime [not null, note: 'Fecha y hora de la experiencia']
+  
+  // Campos de pricing detallado
+  total_price real [not null, note: 'Precio total final de la reserva']
+  base_price real [not null, note: 'Precio base (precio_experiencia × participantes)']
+  service_price real [default: 0, note: 'Costo total de servicios adicionales']
+  additional_services_cost real [default: 0, note: 'Costo de servicios adicionales']
+  group_discount real [default: 0, note: 'Descuento aplicado por grupo grande']
+  discount_percentage real [default: 0, note: 'Porcentaje de descuento aplicado']
+  discount_amount real [default: 0, note: 'Monto del descuento en pesos']
+  
+  // Estado y servicios
+  status text [not null, default: 'pending', note: 'Estado: pending, confirmed, cancelled, completed']
+  additional_services text [note: 'JSON con servicios adicionales solicitados']
+  services text [note: 'JSON con detalles de servicios incluidos']
+  
+  // Campos de auditoría y cancelación
+  cancellation_reason text [note: 'Motivo de cancelación si aplica']
+  cancelled_at datetime [note: 'Fecha de cancelación']
+  created_at datetime [default: `CURRENT_TIMESTAMP`, note: 'Fecha de creación de la reserva']
+  updated_at datetime [default: `CURRENT_TIMESTAMP`, note: 'Última actualización']
+
+  Note: '''
+  Sistema completo de reservas con cálculo automático de precios.
+  
+  **Estados de reserva:**
+  - **pending**: Reserva creada, pendiente de confirmación
+  - **confirmed**: Reserva confirmada, pago procesado
+  - **cancelled**: Reserva cancelada por usuario o sistema
+  - **completed**: Experiencia ya realizada
+  
+  **Cálculo de precios:**
+  1. base_price = precio_experiencia × participantes
+  2. service_price = suma de servicios adicionales
+  3. discount_amount = descuento por grupo (8+ personas)
+  4. total_price = base_price + service_price - discount_amount
+  
+  **Servicios adicionales disponibles:**
+  - Guía especializada (+20% del precio base)
+  - Transporte (+15% del precio base)  
+  - Alimentación (+10% del precio base)
+  - Equipo especializado (+5% del precio base)
+  
+  **Descuentos por grupo:**
+  - 8-14 participantes: 10% de descuento
+  - 15+ participantes: 15% de descuento
+  '''
+
+  indexes {
+    experience_id
+    user_id
+    status
+    reservation_date
+    created_at
+  }
+}
+
+// ====================================
+// TABLA DE CONTROL DE MIGRACIONES
+// ====================================
+Table migrations {
+  id integer [pk, increment, not null, note: 'ID de la migración']
+  name text [unique, not null, note: 'Nombre único de la migración']
+  executed_at datetime [default: `CURRENT_TIMESTAMP`, note: 'Fecha de ejecución']
+
+  Note: '''
+  Tabla de control para el sistema de migraciones de la base de datos.
+  Registra qué migraciones han sido ejecutadas para evitar duplicados.
+  
+  Migraciones implementadas:
+  - 001_create_users_table
+  - 002_create_communities_table  
+  - 003_create_experiences_table
+  - 004_create_reservations_table
+  - 005_add_image_fields
+  - 006_add_location_fields_to_experiences
+  '''
+}
+
+// ====================================
+// RELACIONES Y RESTRICCIONES
+// ====================================
+
+// Referencia: Experiencias pertenecen a comunidades
+Ref: experiences.community_id > communities.id [
+  delete: cascade,
+  note: 'Una experiencia debe pertenecer a una comunidad activa'
+]
+
+// Referencia: Experiencias son creadas por operadores
+Ref: experiences.operator_id > users.id [
+  delete: cascade,
+  note: 'Una experiencia debe tener un operador responsable'
+]
+
+// Referencia: Reservas de experiencias específicas  
+Ref: reservations.experience_id > experiences.id [
+  delete: cascade,
+  note: 'Una reserva debe estar asociada a una experiencia existente'
+]
+
+// Referencia: Reservas hechas por usuarios
+Ref: reservations.user_id > users.id [
+  delete: cascade, 
+  note: 'Una reserva debe estar asociada a un usuario registrado'
+]
+
+// ====================================
+// ENUMS Y CONSTRAINTS
+// ====================================
+
+Enum user_types {
+  viajero [note: 'Usuario que busca y reserva experiencias']
+  operador [note: 'Miembro de comunidad que ofrece experiencias']  
+  admin [note: 'Administrador del sistema']
+}
+
+Enum experience_types {
+  cultural [note: 'Experiencias de intercambio cultural, talleres, gastronomía']
+  historica [note: 'Tours históricos, sitios arqueológicos, memoria ancestral']
+  ecologica [note: 'Ecoturismo, senderismo, conservación, avistamiento']
+}
+
+Enum reservation_statuses {
+  pending [note: 'Reserva creada, esperando confirmación']
+  confirmed [note: 'Reserva confirmada y pagada']
+  cancelled [note: 'Reserva cancelada']
+  completed [note: 'Experiencia ya realizada']
+}
+
+// ====================================
+// ÍNDICES ADICIONALES PARA PERFORMANCE
+// ====================================
+
+Table query_optimizations {
+  note: '''
+  **Consultas más frecuentes optimizadas:**
+  
+  1. **Búsqueda de experiencias activas por región:**
+     - Índice: (communities.region, experiences.is_active)
+     
+  2. **Experiencias disponibles en fecha específica:**
+     - Índice: (reservations.reservation_date, reservations.status)
+     
+  3. **Reservas por operador:**
+     - Índice: (experiences.operator_id, reservations.created_at)
+     
+  4. **Búsquedas geográficas:**
+     - Índices: (latitude, longitude) en communities y experiences
+     
+  5. **Estadísticas por tipo de experiencia:**
+     - Índice: (experiences.type, experiences.is_active)
+  '''
+}
+
+// ====================================
+// VISTAS CALCULADAS Y ESTADÍSTICAS
+// ====================================
+
+Table stats_summary {
+  note: '''
+  **Métricas calculadas por la aplicación:**
+  
+  **Por Comunidad:**
+  - Número de experiencias activas
+  - Total de reservas recibidas
+  - Ingresos generados
+  - Promedio de calificación
+  
+  **Por Experiencia:**  
+  - Número total de reservas
+  - Tasa de ocupación por mes
+  - Ingresos por servicios adicionales
+  - Participantes promedio
+  
+  **Globales del Sistema:**
+  - Total de usuarios por tipo
+  - Experiencias por región
+  - Reservas por estado
+  - Ingresos totales del turismo comunitario
+  
+  Estas estadísticas se calculan en tiempo real por los servicios
+  de la aplicación y se pueden cachear para dashboards.
+  '''
+}

@@ -1,0 +1,64 @@
+/* Estilos específicos para corregir problemas de foco en Electron */
+.experience-form-input,
+.experience-form-textarea,
+.experience-form-select {
+  /* Asegurar que los campos sean completamente interactivos */
+  pointer-events: auto !important;
+  user-select: text !important;
+  -webkit-user-select: text !important;
+  -moz-user-select: text !important;
+  -ms-user-select: text !important;
+  
+  /* Prevenir que Electron bloquee la interacción */
+  -webkit-app-region: no-drag;
+  
+  /* Estilos de foco mejorados */
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.experience-form-input:focus,
+.experience-form-textarea:focus,
+.experience-form-select:focus {
+  border-color: #fbd338 !important;
+  box-shadow: 0 0 0 2px rgba(251, 211, 56, 0.2) !important;
+  outline: none !important;
+}
+
+/* Prevenir problemas de selección de texto */
+.experience-form-input::-webkit-selection,
+.experience-form-textarea::-webkit-selection {
+  background-color: rgba(251, 211, 56, 0.3);
+}
+
+.experience-form-input::-moz-selection,
+.experience-form-textarea::-moz-selection {
+  background-color: rgba(251, 211, 56, 0.3);
+}
+
+/* Asegurar que los placeholders sean visibles */
+.experience-form-input::placeholder,
+.experience-form-textarea::placeholder {
+  color: #999;
+  opacity: 1;
+}
+
+/* Corregir problemas específicos de Electron con inputs disabled */
+.experience-form-input:disabled,
+.experience-form-textarea:disabled,
+.experience-form-select:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Asegurar que el formulario sea completamente interactivo */
+.experience-form-container {
+  -webkit-app-region: no-drag;
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+/* Corregir problemas de z-index si existen overlays */
+.experience-form-container * {
+  position: relative;
+  z-index: 1;
+}

@@ -1,0 +1,273 @@
+# =================================================================
+# COLOMBIA RAÍCES - GITIGNORE CONFIGURATION
+# =================================================================
+
+# Node.js dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+
+# nyc test coverage
+.nyc_output
+
+# Grunt intermediate storage
+.grunt
+
+# Bower dependency directory
+bower_components
+
+# node-waf configuration
+.lock-wscript
+
+# Compiled binary addons
+build/Release
+
+# Dependency directories
+jspm_packages/
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# dotenv environment variables file
+.env
+.env.test
+.env.production
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# =================================================================
+# ELECTRON SPECIFIC
+# =================================================================
+
+# Electron distribution folders
+dist/
+build/
+out/
+
+# Electron-builder output
+dist-electron/
+
+# Generated assets
+app-update.yml
+dev-app-update.yml
+
+# =================================================================
+# DEVELOPMENT & TESTING
+# =================================================================
+
+# Test files (temporary)
+test-*.js
+*-test.js
+verify-*.js
+simple-*.js
+debug-*.js
+
+# Database files (except schema)
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+
+# Keep schema and initial data
+!schema.sql
+!initial-data.sql
+
+# Log files
+*.log
+logs/
+
+# Temporary files
+*.tmp
+*.temp
+nul
+
+# Backup files
+*.backup
+*.bak
+*.old
+
+# =================================================================
+# WEBPACK & BUILD
+# =================================================================
+
+# Webpack build outputs
+renderer/dist/
+renderer/build/
+
+# Bundle analyzer
+bundle-analyzer-report.html
+
+# =================================================================
+# EDITOR & IDE
+# =================================================================
+
+# Visual Studio Code
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Sublime Text
+*.sublime-workspace
+*.sublime-project
+
+# Atom
+.atom/
+
+# =================================================================
+# OPERATING SYSTEM
+# =================================================================
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# =================================================================
+# PROJECT SPECIFIC
+# =================================================================
+
+# Colombia Raíces temporary files
+ready-to-test/
+test-bundle.html
+
+# Scripts de prueba temporales
+test-*.sh
+verify-*.sh
+
+# Documentación temporal
+*_TEMP.md
+*_OLD.md
+
+# Assets temporales (mantener solo los finales)
+assets/temp/
+assets/backup/
+
+# Configuraciones locales
+config/local.js
+config/*.local.js
+
+# =================================================================
+# SECURITY
+# =================================================================
+
+# API keys and secrets
+.env.secret
+secrets.json
+config/secrets.js
+
+# SSL certificates
+*.pem
+*.key
+*.crt
+*.p12
+
+# =================================================================
+# PERFORMANCE & MONITORING
+# =================================================================
+
+# Performance monitoring
+.clinic/
+profile-*
+
+# Bundle size analysis
+bundle-size-*.json
+
+# =================================================================
+# KEEP IMPORTANT FILES (OVERRIDE IGNORES)
+# =================================================================
+
+# Mantener archivos importantes de configuración
+!package.json
+!webpack.config.js
+!tailwind.config.js
+!postcss.config.js
+!electron-builder.config.js
+
+# Mantener documentación principal
+!README.md
+!GUIA_DESARROLLO.md
+!docs/*.md
+
+# Mantener scripts de configuración
+!scripts/build.sh
+!scripts/setup.sh
+
+# Mantener assets principales
+!assets/images/LogoColombiaRaices*.png
+!assets/images/experiences/
+!assets/images/communities/
+!assets/data/*.json
